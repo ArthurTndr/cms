@@ -158,6 +158,13 @@ $(document).ready(function () {
         <div id="main" class="container">
             <div class="row">
                 <div class="span3">
+                    {% if contest.path_to_logo != '' %}
+                            {% if contest.path_to_logo[0] == '/' %}
+                                <img src="{{ url_root }}{{ contest.path_to_logo }}">
+                            {% else %}
+                                <img src="{{ contest.path_to_logo }}">
+                            {% end %}
+                    {% end %}
                     <h3 id="server_time_box">
                         <span id="server_time_label">{{ _("Server time:") }}</span>
                         <span id="server_time"></span>

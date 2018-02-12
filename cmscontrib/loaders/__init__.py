@@ -26,10 +26,11 @@ from six import itervalues, iteritems
 
 from .italy_yaml import YamlLoader
 from .polygon import PolygonTaskLoader, PolygonUserLoader, PolygonContestLoader
+from .insalgo import ShakerUserLoader
 
 LOADERS = dict(
     (loader_class.short_name, loader_class) for loader_class in [
-        YamlLoader, PolygonTaskLoader, PolygonUserLoader, PolygonContestLoader
+        YamlLoader, PolygonTaskLoader, PolygonUserLoader, PolygonContestLoader, ShakerUserLoader
     ]
 )
 

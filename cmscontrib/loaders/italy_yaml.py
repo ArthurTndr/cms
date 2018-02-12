@@ -140,6 +140,9 @@ class YamlLoader(ContestLoader, TaskLoader, UserLoader, TeamLoader):
     def user_loader(self, username):
         return YamlLoader(os.path.join(self.path, username), self.file_cacher)
 
+    def get_user_loader(self, username):
+        return YamlLoader(os.path.join(self.path, username), self.file_cacher)
+
     def get_task_loader(self, taskname):
         return YamlLoader(os.path.join(self.path, taskname), self.file_cacher)
 
