@@ -224,8 +224,9 @@ class YamlLoader(ContestLoader, TaskLoader, UserLoader, TeamLoader):
 
         tasks = load(conf, None, ["tasks", "problemi"])
         participations = load(conf, None, ["users", "utenti"])
-        for p in participations:
-            p["password"] = build_password(p["password"])
+        if participations is not None:
+            for p in participations:
+                p["password"] = build_password(p["password"])
 
         # Import was successful
         os.remove(os.path.join(self.path, ".import_error_contest"))
