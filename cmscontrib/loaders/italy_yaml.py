@@ -137,6 +137,9 @@ class YamlLoader(ContestLoader, TaskLoader, UserLoader, TeamLoader):
             os.path.exists(os.path.join(path, "task.yaml")) or \
             os.path.exists(os.path.join(os.path.dirname(path), "contest.yaml"))
 
+    def user_loader(self, username):
+        return YamlLoader(os.path.join(self.path, username), self.file_cacher)
+
     def get_task_loader(self, taskname):
         return YamlLoader(os.path.join(self.path, taskname), self.file_cacher)
 
@@ -159,6 +162,10 @@ class YamlLoader(ContestLoader, TaskLoader, UserLoader, TeamLoader):
 
         load(conf, args, ["name", "nome_breve"])
         load(conf, args, ["description", "nome"])
+        load(conf, args, "presentation")
+        load(conf, args, "path_to_logo")
+        load(conf, args, "timezone")
+        load(conf, args, "timezone")
 
         logger.info("Loading parameters for contest %s.", args["name"])
 

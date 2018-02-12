@@ -76,6 +76,11 @@ class Contest(Base):
     description = Column(
         Unicode,
         nullable=False)
+    # Presentation of the contest (human readable).
+    presentation = Column(
+        Unicode,
+        default="",
+        nullable=False)
 
     # The list of language codes of the localizations that contestants
     # are allowed to use (empty means all).
@@ -260,6 +265,10 @@ class Contest(Base):
         nullable=False,
         default=0)
 
+    path_to_logo = Column(
+        Unicode,
+        default="",
+        nullable=False)
     # Follows the description of the fields automatically added by
     # SQLAlchemy.
     # tasks (list of Task objects)

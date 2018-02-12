@@ -11,14 +11,20 @@
     <h1>{{ _("Overview") }}</h1>
 </div>
 
-<h2>{{ _("General information") }}</h2>
 <div class="row">
 {% if contest.per_user_time is not None %}
     <div class="span5">
 {% else %}
     <div class="span9">
 {% end %}
+        <h2 style="margin-top: 0">{{ _("General information") }}</h2>
         <p>
+        {% if contest.presentation != "" %}
+            {% contest.presentation %}
+            <br>
+            <br>
+        {% end %}
+
 {% if phase == -1 %}
         {{ _("The contest hasn't started yet.") }}
         </p>

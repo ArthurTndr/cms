@@ -712,7 +712,7 @@ msgstr ""
 "normalement, veuillez en notifier les administrateurs du concours."
 
 msgid "General information"
-msgstr "Information générale"
+msgstr "Informations générales"
 
 msgid "The contest hasn't started yet."
 msgstr "L'épreuve n'a pas encore commencé."

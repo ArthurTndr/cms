@@ -48,6 +48,22 @@ def utf_8_encoder(unicode_csv_data):
         yield line.encode('utf-8')
 
 
+# Code from https://docs.python.org/2.7/library/csv.html#examples
+def unicode_csv_reader(unicode_csv_data, **kwargs):
+    # csv.py doesn't do Unicode; encode temporarily as UTF-8:
+    csv_reader = csv.reader(utf_8_encoder(unicode_csv_data),
+                            delimiter=str(','),
+                            quotechar=str('"'),
+                            **kwargs)
+    for row in csv_reader:
+        # decode UTF-8 back to Unicode, cell by cell:
+        yield [unicode(cell, 'utf-8') for cell in row]
+
+def utf_8_encoder(unicode_csv_data):
+    for line in unicode_csv_data:
+        yield line.encode('utf-8')
+
+
 class ShakerUserLoader(YamlLoader):
     """Load users stored using the Shaker format.
 

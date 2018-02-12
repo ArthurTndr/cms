@@ -162,7 +162,13 @@ class ContestImporter(BaseImporter):
             if participations is None:
                 participations = []
 
+            current_participation = 0
+            participations_len = len(participations)
             for p in participations:
+                current_participation += 1
+                logger.info('Importing user %d of %d...'
+                            % (current_participation, participations_len))
+
                 user = session.query(User) \
                               .filter(User.username == p["username"]).first()
 

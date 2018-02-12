@@ -324,7 +324,8 @@ def file_handler_gen(BaseClass):
             """
             self.set_header("Content-Type", content_type)
             self.set_header("Content-Disposition",
-                            "attachment; filename=\"%s\"" % filename)
+                            "inline; filename=\"%s\"" % filename)
+            #                "attachment; filename=\"%s\"" % filename)
             self.start_time = time.time()
             self.size = 0
 

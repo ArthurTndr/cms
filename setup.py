@@ -136,6 +136,7 @@ setup(
             "cmsDumpExporter=cmscontrib.DumpExporter:main",
             "cmsDumpImporter=cmscontrib.DumpImporter:main",
             "cmsDumpUpdater=cmscontrib.DumpUpdater:main",
+            "cmsDumpUsers=cmscontrib.DumpUsers:main",
             "cmsExportSubmissions=cmscontrib.ExportSubmissions:main",
             "cmsImportContest=cmscontrib.ImportContest:main",
             "cmsImportDataset=cmscontrib.ImportDataset:main",
