@@ -160,7 +160,7 @@ $(document).ready(function () {
                 <div class="span3">
                     {% if contest.path_to_logo != '' %}
                             {% if contest.path_to_logo[0] == '/' %}
-                                <img src="{{ url_root }}{{ contest.path_to_logo }}">
+                                <img src="{{ url }}{{ contest.path_to_logo }}">
                             {% else %}
                                 <img src="{{ contest.path_to_logo }}">
                             {% end %}
