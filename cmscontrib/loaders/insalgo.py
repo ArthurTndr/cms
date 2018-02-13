@@ -15,6 +15,7 @@ import csv
 from datetime import timedelta
 
 from cms.db import User
+from cmscommon.crypto import build_password
 from cmscontrib.loaders import YamlLoader
 
 logger = logging.getLogger(__name__)
@@ -144,16 +145,20 @@ class ShakerUserLoader(YamlLoader):
 
             if userdata is not None:
                 logger.info("Loading parameters for user %s.", username)
-                args = {}
-                args['username'] = get_param('Pseudo')
-                args['password'] = get_param('Mot de passe', '')
-                args['first_name'] = get_param('Prénom', '')
-                args['last_name'] = get_param('Nom', '')
+                args = {
+                    'username': get_param('Pseudo'),
+                    'password': get_param('Mot de passe', ''),
+                    'first_name': get_param('Prénom', ''),
+                    'last_name': get_param('Nom', '')
+                }
                 # args['hidden'] = get_param('hidden', False) == '1'
 
                 # Generate a password if none is defined
                 if len(args['password']) == 0:
                     args['password'] = random_password()
+
+                # Build an auth string from the password
+                args['password'] = build_password(args['password'])
 
                 logger.info("User parameters loaded.")
                 return User(**args)
