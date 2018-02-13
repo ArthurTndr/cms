@@ -61,13 +61,12 @@ class Kotlin(Language):
         """See Language.get_compilation_commands."""
         # We need to let the shell expand *.class as javac create
         # a class file for each inner class.
-        compile_command = ["/usr/bin/kotlinc", source_filenames, "-include-runtime",
-                           "-d", "%s.jar" % executable_filename]
+        compile_command = ["/usr/bin/kotlinc"] + source_filenames + \
+                          ["-include-runtime", "-d", "%s.jar" % executable_filename]
         mv_command = ["/bin/mv",
                       "%s.jar" % executable_filename,
                       executable_filename]
         return [compile_command, mv_command]
-    #kotlinc hello.kt -include-runtime -d hello.jar
 
     def get_evaluation_commands(
             self, executable_filename, main=None, args=None):
