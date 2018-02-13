@@ -44,7 +44,7 @@ import tornado.web
 
 from cms.db import Contest
 from cms.server import CommonRequestHandler
-
+from cms.server.util import get_url_root
 
 logger = logging.getLogger(__name__)
 
@@ -91,6 +91,7 @@ class BaseHandler(CommonRequestHandler):
         ret = {}
         ret["timestamp"] = self.timestamp
         ret["url"] = self.url
+        ret["url_root"] = get_url_root(self.request.path)
 
         ret["contest_list"] = self.contest_list
 
