@@ -3,7 +3,7 @@
 
 # Contest Management System - http://cms-dev.github.io/
 # Copyright © 2010-2014 Giovanni Mascellani <mascellani@poisson.phc.unipi.it>
-# Copyright © 2010-2012 Stefano Maggiolo <s.maggiolo@gmail.com>
+# Copyright © 2010-2018 Stefano Maggiolo <s.maggiolo@gmail.com>
 # Copyright © 2010-2012 Matteo Boscariol <boscarim@hotmail.com>
 # Copyright © 2013 Luca Wehrstedt <luca.wehrstedt@gmail.com>
 #
@@ -28,10 +28,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 
-import hashlib
+import errno
 import io
 import os
 import random
@@ -39,7 +39,10 @@ import shutil
 import unittest
 from io import BytesIO
 
-from cmscommon.binary import bin_to_hex
+# Needs to be first to allow for monkey patching the DB connection string.
+from cmstestsuite.unit_tests.databasemixin import DatabaseMixin
+
+from cmscommon.digest import Digester, bytes_digest
 from cms.db.filecacher import FileCacher
 
 
@@ -52,7 +55,7 @@ class RandomFile(object):
         self.dim = dim
         # FIXME We could use os.urandom() instead.
         self.source = io.open('/dev/urandom', 'rb')
-        self.hasher = hashlib.sha1()
+        self.digester = Digester()
 
     def read(self, byte_num):
         """Read byte_num bytes from the source and return them,
@@ -69,7 +72,7 @@ class RandomFile(object):
             return b''
         buf = self.source.read(byte_num)
         self.dim -= len(buf)
-        self.hasher.update(buf)
+        self.digester.update(buf)
         return buf
 
     def close(self):
@@ -85,7 +88,7 @@ class RandomFile(object):
         return (string): digest.
 
         """
-        return bin_to_hex(self.hasher.digest())
+        return self.digester.digest()
 
 
 class HashingFile(object):
@@ -93,7 +96,7 @@ class HashingFile(object):
 
     """
     def __init__(self):
-        self.hasher = hashlib.sha1()
+        self.digester = Digester()
 
     def write(self, buf):
         """Update the hashing with the content of buf.
@@ -103,7 +106,7 @@ class HashingFile(object):
         return (int): length of buf.
 
         """
-        self.hasher.update(buf)
+        self.digester.update(buf)
         return len(buf)
 
     @property
@@ -113,7 +116,7 @@ class HashingFile(object):
         return (string): digest.
 
         """
-        return bin_to_hex(self.hasher.digest())
+        return self.digester.digest()
 
     def close(self):
         """Do nothing, because there is no hidden file we are writing
@@ -123,15 +126,14 @@ class HashingFile(object):
         pass
 
 
-class TestFileCacher(unittest.TestCase):
-    """Service that performs automatically some tests for the
-    FileCacher service.
+class TestFileCacherBase(object):
+    """Base class for performing tests for the FileCacher service.
 
     """
 
-    def setUp(self):
-        self.file_cacher = FileCacher()
-        #self.file_cacher = FileCacher(self, path="fs-storage")
+    def _setUp(self, file_cacher):
+        """Common initialization that should be called by derived classes."""
+        self.file_cacher = file_cacher
         self.cache_base_path = self.file_cacher.file_dir
         self.cache_path = None
         self.content = None
@@ -139,8 +141,32 @@ class TestFileCacher(unittest.TestCase):
         self.digest = None
         self.file_obj = None
 
-    def tearDown(self):
-        shutil.rmtree(self.cache_base_path, ignore_errors=True)
+    def check_stored_file(self, digest):
+        """Ensure that a given file digest has been stored correctly."""
+        # Remove it from the filesystem.
+        cache_path = os.path.join(self.cache_base_path, digest)
+        try:
+            os.unlink(cache_path)
+        except OSError as e:
+            # Only ignore if the file didn't exist. Other failures we should
+            # know about!
+            if e.errno == errno.ENOENT:
+                pass
+
+        # Pull it out of the file_cacher and compute the hash
+        hash_file = HashingFile()
+        try:
+            self.file_cacher.get_file_to_fobj(digest, hash_file)
+        except Exception as error:
+            self.fail("Error received: %r." % error)
+        my_digest = hash_file.digest
+        hash_file.close()
+
+        # Ensure the digest matches.
+        if digest != my_digest:
+            self.fail("Content differs.")
+        if not os.path.exists(cache_path):
+            self.fail("File not stored in local cache.")
 
     def test_file_life(self):
         """Send a ~100B random binary file to the storage through
@@ -302,23 +328,77 @@ class TestFileCacher(unittest.TestCase):
         self.cache_path = os.path.join(self.cache_base_path, data)
         self.digest = data
 
-        # Get the ~100MB file from FileCacher.
-        os.unlink(self.cache_path)
-        hash_file = HashingFile()
-        try:
-            self.file_cacher.get_file_to_fobj(self.digest, hash_file)
-        except Exception as error:
-            self.fail("Error received: %r." % error)
-        my_digest = hash_file.digest
-        hash_file.close()
+        # Check file is stored correctly in FileCacher.
+        self.check_stored_file(self.digest)
 
-        try:
-            if self.digest != my_digest:
-                self.fail("Content differs.")
-            if not os.path.exists(self.cache_path):
-                self.fail("File not stored in local cache.")
-        finally:
-            self.file_cacher.delete(self.digest)
+        self.file_cacher.delete(self.digest)
+
+    def test_file_duplicates(self):
+        """Send multiple copies of the a file into FileCacher.
+
+        Generates a random file and attempts to store them into the FileCacher.
+        FC should handle this gracefully and only end up with one copy.
+
+        """
+        content = os.urandom(100)
+        digest = bytes_digest(content)
+
+        # Test writing the same file to the DB in parallel.
+        # Create empty files.
+        num_files = 4
+        fobjs = []
+        for _ in range(num_files):
+            fobj = self.file_cacher.backend.create_file(digest)
+            # As the file contains random data, we don't expect to have put
+            # this into the DB previously.
+            assert fobj is not None
+            fobjs.append(fobj)
+
+        # Close them in a different order. Seed to make the shuffle
+        # deterministic.
+        r = random.Random()
+        r.seed(num_files)
+        r.shuffle(fobjs)
+
+        # Write the files and commit them.
+        for i, fobj in enumerate(fobjs):
+            fobj.write(content)
+            # Ensure that only one copy made it into the database.
+            commit_ok = \
+                self.file_cacher.backend.commit_file(fobj,
+                                                     digest,
+                                                     desc='Copy %d' % i)
+            # Only the first commit should succeed.
+            assert commit_ok == (i == 0), \
+                "Commit of %d was %s unexpectedly" % (i, commit_ok)
+
+        # Check that the file was stored correctly.
+        self.check_stored_file(digest)
+
+
+class TestFileCacherDB(TestFileCacherBase, DatabaseMixin, unittest.TestCase):
+    """Tests for the FileCacher service with a database backend."""
+
+    def setUp(self):
+        super(TestFileCacherDB, self).setUp()
+        file_cacher = FileCacher()
+        self._setUp(file_cacher)
+
+    def tearDown(self):
+        shutil.rmtree(self.cache_base_path, ignore_errors=True)
+
+
+class TestFileCacherFS(TestFileCacherBase, unittest.TestCase):
+    """Tests for the FileCacher service with a filesystem backend."""
+
+    def setUp(self):
+        super(TestFileCacherFS, self).setUp()
+        file_cacher = FileCacher(path="fs-storage")
+        self._setUp(file_cacher)
+
+    def tearDown(self):
+        shutil.rmtree(self.cache_base_path, ignore_errors=True)
+        shutil.rmtree("fs-storage", ignore_errors=True)
 
 
 if __name__ == "__main__":

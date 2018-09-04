@@ -25,14 +25,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 
 from sqlalchemy.schema import Column, ForeignKey
-from sqlalchemy.types import Integer, String, Unicode, DateTime, Boolean
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.types import Integer, String, DateTime, Boolean
+from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import ARRAY
 
-from . import Base, Participation, FilenameConstraint, DigestConstraint
+from . import Filename, Digest, Base, Participation
 
 
 class PrintJob(Base):
@@ -55,9 +56,7 @@ class PrintJob(Base):
         index=True)
     participation = relationship(
         Participation,
-        backref=backref("printjobs",
-                        cascade="all, delete-orphan",
-                        passive_deletes=True))
+        back_populates="printjobs")
 
     # Submission time of the print job.
     timestamp = Column(
@@ -66,12 +65,10 @@ class PrintJob(Base):
 
     # Filename and digest of the submitted file.
     filename = Column(
-        Unicode,
-        FilenameConstraint("filename"),
+        Filename,
         nullable=False)
     digest = Column(
-        String,
-        DigestConstraint("digest"),
+        Digest,
         nullable=False)
 
     done = Column(
@@ -80,5 +77,6 @@ class PrintJob(Base):
         default=False)
 
     status = Column(
-        Unicode,
-        nullable=True)
+        ARRAY(String),
+        nullable=False,
+        default=[])

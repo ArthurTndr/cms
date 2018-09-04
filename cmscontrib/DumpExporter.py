@@ -3,7 +3,7 @@
 
 # Contest Management System - http://cms-dev.github.io/
 # Copyright © 2010-2012 Giovanni Mascellani <mascellani@poisson.phc.unipi.it>
-# Copyright © 2010-2016 Stefano Maggiolo <s.maggiolo@gmail.com>
+# Copyright © 2010-2018 Stefano Maggiolo <s.maggiolo@gmail.com>
 # Copyright © 2010-2012 Matteo Boscariol <boscarim@hotmail.com>
 # Copyright © 2013-2018 Luca Wehrstedt <luca.wehrstedt@gmail.com>
 # Copyright © 2014 Luca Versari <veluca93@gmail.com>
@@ -30,14 +30,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
-from six import itervalues, iteritems
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
+from six import PY3, itervalues, iteritems
 
 # We enable monkey patching to make many libraries gevent-friendly
 # (for instance, urllib3, used by requests)
 import gevent.monkey
-gevent.monkey.patch_all()
+gevent.monkey.patch_all()  # noqa
 
 import argparse
 import io
@@ -52,15 +52,15 @@ from sqlalchemy.types import \
     Boolean, Integer, Float, String, Unicode, DateTime, Interval, Enum
 from sqlalchemy.dialects.postgresql import ARRAY, CIDR, JSONB
 
-from cms import utf8_decoder
-from cms.db import version as model_version
+from cms import rmtree, utf8_decoder
+from cms.db import version as model_version, Codename, Filename, \
+    FilenameSchema, FilenameSchemaArray, Digest
 from cms.db import SessionGen, Contest, User, Task, Submission, UserTest, \
-    SubmissionResult, UserTestResult
+    SubmissionResult, UserTestResult, PrintJob, enumerate_files
 from cms.db.filecacher import FileCacher
-from cms.io.GeventUtils import rmtree
 
-from cmscontrib import sha1sum
 from cmscommon.datetime import make_timestamp
+from cmscommon.digest import path_digest
 
 from datetime import date
 
@@ -122,15 +122,15 @@ def encode_value(type_, value):
     """
     if value is None:
         return None
-    elif isinstance(type_, (Boolean, Integer, Float, Unicode, Enum, JSONB)):
+    elif isinstance(type_, (
+            Boolean, Integer, Float, String, Unicode, Enum, JSONB, Codename,
+            Filename, FilenameSchema, Digest)):
         return value
-    elif isinstance(type_, String):
-        return value.decode('latin1')
     elif isinstance(type_, DateTime):
         return make_timestamp(value)
     elif isinstance(type_, Interval):
         return value.total_seconds()
-    elif isinstance(type_, ARRAY):
+    elif isinstance(type_, (ARRAY, FilenameSchemaArray)):
         return list(encode_value(type_.item_type, item) for item in value)
     elif isinstance(type_, CIDR):
         return str(value)
@@ -147,7 +147,7 @@ class DumpExporter(object):
 
     def __init__(self, contest_ids, export_target,
                  dump_files, dump_model, skip_generated,
-                 skip_submissions, skip_user_tests):
+                 skip_submissions, skip_user_tests, skip_print_jobs):
         if contest_ids is None:
             with SessionGen() as session:
                 contests = session.query(Contest).all()
@@ -169,6 +169,7 @@ class DumpExporter(object):
         self.skip_generated = skip_generated
         self.skip_submissions = skip_submissions
         self.skip_user_tests = skip_user_tests
+        self.skip_print_jobs = skip_print_jobs
         self.export_target = export_target
 
         # If target is not provided, we use the contest's name.
@@ -214,9 +215,12 @@ class DumpExporter(object):
             if self.dump_files:
                 for contest_id in self.contests_ids:
                     contest = Contest.get_from_id(contest_id, session)
-                    files = contest.enumerate_files(self.skip_submissions,
-                                                    self.skip_user_tests,
-                                                    self.skip_generated)
+                    files = enumerate_files(
+                        session, contest,
+                        skip_submissions=self.skip_submissions,
+                        skip_user_tests=self.skip_user_tests,
+                        skip_print_jobs=self.skip_print_jobs,
+                        skip_generated=self.skip_generated)
                     for file_ in files:
                         if not self.safe_get_file(file_,
                                                   os.path.join(files_dir,
@@ -253,16 +257,19 @@ class DumpExporter(object):
 
                 data["_version"] = model_version
 
-                with io.open(os.path.join(export_dir,
-                                          "contest.json"), "wb") as fout:
-                    json.dump(data, fout, indent=4, sort_keys=True)
+                destination = os.path.join(export_dir, "contest.json")
+                if PY3:
+                    with io.open(destination, "wt", encoding="utf-8") as fout:
+                        json.dump(data, fout, indent=4, sort_keys=True)
+                else:
+                    with io.open(destination, "wb") as fout:
+                        json.dump(data, fout, indent=4, sort_keys=True)
 
         # If the admin requested export to file, we do that.
         if archive_info["write_mode"] != "":
-            archive = tarfile.open(self.export_target,
-                                   archive_info["write_mode"])
-            archive.add(export_dir, arcname=archive_info["basename"])
-            archive.close()
+            with tarfile.open(self.export_target,
+                              archive_info["write_mode"]) as archive:
+                archive.add(export_dir, arcname=archive_info["basename"])
             rmtree(export_dir)
 
         logger.info("Export finished.")
@@ -298,7 +305,7 @@ class DumpExporter(object):
         an ID we generate a new ID, assign it to the object and append
         the object to the queue of objects to export.
 
-        The self.skip_submissions flag controls wheter we export
+        The self.skip_submissions flag controls whether we export
         submissions (and all other objects that can be reached only by
         passing through a submission) or not.
 
@@ -323,6 +330,10 @@ class DumpExporter(object):
 
             # Skip user_tests if requested
             if self.skip_user_tests and other_cls is UserTest:
+                continue
+
+            # Skip print jobs if requested
+            if self.skip_print_jobs and other_cls is PrintJob:
                 continue
 
             # Skip generated data if requested
@@ -370,7 +381,7 @@ class DumpExporter(object):
             return False
 
         # Then check the digest
-        calc_digest = sha1sum(path)
+        calc_digest = path_digest(path)
         if digest != calc_digest:
             logger.critical("File %s has wrong hash %s.",
                             digest, calc_digest)
@@ -401,6 +412,8 @@ def main():
                         help="don't export submissions")
     parser.add_argument("-U", "--no-user-tests", action="store_true",
                         help="don't export user tests")
+    parser.add_argument("-P", "--no-print-jobs", action="store_true",
+                        help="don't export print jobs")
     parser.add_argument("export_target", action="store",
                         type=utf8_decoder, nargs='?', default="",
                         help="target directory or archive for export")
@@ -413,7 +426,8 @@ def main():
                             dump_model=not args.files,
                             skip_generated=args.no_generated,
                             skip_submissions=args.no_submissions,
-                            skip_user_tests=args.no_user_tests)
+                            skip_user_tests=args.no_user_tests,
+                            skip_print_jobs=args.no_print_jobs)
     success = exporter.do_export()
     return 0 if success is True else 1
 

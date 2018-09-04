@@ -21,9 +21,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
-from six import iterkeys, iteritems
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
+from six import PY3, iterkeys, iteritems
 
 import io
 import json
@@ -33,7 +33,6 @@ import re
 
 from gevent.lock import RLock
 
-from cmsranking.Config import config
 from cmsranking.Entity import Entity, InvalidKey, InvalidData
 
 
@@ -55,7 +54,7 @@ class Store(object):
     callbacks.
 
     """
-    def __init__(self, entity, dir_name, depends=None):
+    def __init__(self, entity, path, all_stores, depends=None):
         """Initialize an empty EntityStore.
 
         The entity definition given as argument will define what kind
@@ -69,7 +68,8 @@ class Store(object):
             raise ValueError("The 'entity' parameter "
                              "isn't a subclass of Entity")
         self._entity = entity
-        self._path = os.path.join(config.lib_dir, dir_name)
+        self._path = path
+        self._all_stores = all_stores
         self._depends = depends if depends is not None else []
         self._store = dict()
         self._create_callbacks = list()
@@ -157,7 +157,7 @@ class Store(object):
         with LOCK:
             item = self._entity()
             item.set(data)
-            if not item.consistent():
+            if not item.consistent(self._all_stores):
                 raise InvalidData("Inconsistent data")
             item.key = key
             self._store[key] = item
@@ -167,8 +167,12 @@ class Store(object):
             # reflect changes on the persistent storage
             try:
                 path = os.path.join(self._path, key + '.json')
-                with io.open(path, 'wb') as rec:
-                    json.dump(self._store[key].get(), rec)
+                if PY3:
+                    with io.open(path, 'wt', encoding="utf-8") as rec:
+                        json.dump(self._store[key].get(), rec)
+                else:
+                    with io.open(path, 'wb') as rec:
+                        json.dump(self._store[key].get(), rec)
             except IOError:
                 logger.error("I/O error occured while creating entity",
                              exc_info=True)
@@ -195,7 +199,7 @@ class Store(object):
         with LOCK:
             item = self._entity()
             item.set(data)
-            if not item.consistent():
+            if not item.consistent(self._all_stores):
                 raise InvalidData("Inconsistent data")
             item.key = key
             old_item = self._store[key]
@@ -206,8 +210,12 @@ class Store(object):
             # reflect changes on the persistent storage
             try:
                 path = os.path.join(self._path, key + '.json')
-                with io.open(path, 'wb') as rec:
-                    json.dump(self._store[key].get(), rec)
+                if PY3:
+                    with io.open(path, 'wt', encoding="utf-8") as rec:
+                        json.dump(self._store[key].get(), rec)
+                else:
+                    with io.open(path, 'wb') as rec:
+                        json.dump(self._store[key].get(), rec)
             except IOError:
                 logger.error("I/O error occured while updating entity",
                              exc_info=True)
@@ -238,7 +246,7 @@ class Store(object):
                         raise InvalidData("Invalid key")
                     item = self._entity()
                     item.set(value)
-                    if not item.consistent():
+                    if not item.consistent(self._all_stores):
                         raise InvalidData("Inconsistent data")
                     item.key = key
                     item_dict[key] = item
@@ -262,8 +270,12 @@ class Store(object):
                 # reflect changes on the persistent storage
                 try:
                     path = os.path.join(self._path, key + '.json')
-                    with io.open(path, 'wb') as rec:
-                        json.dump(value.get(), rec)
+                    if PY3:
+                        with io.open(path, 'wt', encoding="utf-8") as rec:
+                            json.dump(value.get(), rec)
+                    else:
+                        with io.open(path, 'wb') as rec:
+                            json.dump(value.get(), rec)
                 except IOError:
                     logger.error(
                         "I/O error occured while merging entity lists",
@@ -290,7 +302,7 @@ class Store(object):
             # enforce consistency
             for depend in self._depends:
                 for o_key, o_value in list(iteritems(depend._store)):
-                    if not o_value.consistent():
+                    if not o_value.consistent(self._all_stores):
                         depend.delete(o_key)
             # notify callbacks
             for callback in self._delete_callbacks:

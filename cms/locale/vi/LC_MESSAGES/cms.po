@@ -22,7 +22,7 @@ msgstr ""
 msgid "Compilation succeeded"
 msgstr "Biên dịch thành công"
 
-msgid "Your submission successfully compiled to an excutable."
+msgid "Your submission successfully compiled to an executable."
 msgstr "Bài nộp của bạn đã được biên dịch thành một file có thể chạy."
 
 msgid "Compilation failed"
@@ -120,23 +120,6 @@ msgstr ""
 "giới hạn bộ nhớ. Trong trường hợp đó, lượng bộ nhớ sử dụng được hiển thị là "
 "lượng bộ nhớ ngay trước thao tác cấp phát gây ra tín hiệu ngắt."
 
-#, python-format
-msgid "Execution killed because of forbidden syscall %s"
-msgstr "Chương trình bị ngắt do syscall %s bị cấm"
-
-msgid ""
-"Your submission was killed because it tried to use the forbidden syscall "
-"specified in the message."
-msgstr "Bài nộp của bạn bị ngắt do sử dụng syscall bị cấm nêu trên."
-
-msgid "Execution killed because of forbidden file access"
-msgstr "Chương trình bị ngắt do truy cập file bị cấm"
-
-msgid ""
-"Your submission was killed because it tried to read or write a forbidden "
-"file."
-msgstr "Bài nộp của bạn bị ngắt do đọc hoặc ghi một file bị cấm."
-
 msgid "Execution failed because the return code was nonzero"
 msgstr "Chương trình chạy không thành công vì exitcode khác 0"
 
@@ -148,8 +131,8 @@ msgid "N/A"
 msgstr "N/A"
 
 #, python-format
-msgid "Subtask %d"
-msgstr "Subtask %d"
+msgid "Subtask %(index)s"
+msgstr "Subtask %(index)s"
 
 msgid "Outcome"
 msgstr "Kết quả"
@@ -184,52 +167,11 @@ msgstr "Không cần biên dịch"
 msgid "File not submitted"
 msgstr "File chưa được nộp"
 
-msgid "%Y-%m-%d"
-msgstr "%d-%m-%Y"
-
-msgid "%H:%M:%S"
-msgstr "%H:%M:%S"
-
-msgid "%Y-%m-%d %H:%M:%S"
-msgstr "%H:%M:%S %d-%m-%Y"
-
 msgid "loading..."
 msgstr "đang tải..."
 
 msgid "unknown"
 msgstr "không xác định"
-
-#, python-format
-msgid "%d second"
-msgid_plural "%d seconds"
-msgstr[0] "%d giây"
-msgstr[1] "%d giây"
-
-#, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d phút"
-msgstr[1] "%d phút"
-
-#, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d giờ"
-msgstr[1] "%d giờ"
-
-#, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d ngày"
-msgstr[1] "%d ngày"
-
-#, python-format
-msgid "%s and %s"
-msgstr "%s và %s"
-
-#, python-format
-msgid "more than %s"
-msgstr "nhiều hơn %s"
 
 msgid "contest-token"
 msgstr "contest-token"
@@ -521,12 +463,8 @@ msgid "Executed"
 msgstr "Đã chạy xong"
 
 #, python-format
-msgid "{seconds:0.3f} s"
-msgstr "{seconds:0.3f} giây"
-
-#, python-format
-msgid "Automatic (%s)"
-msgstr "Tự động (%s)"
+msgid "Automatic (%(lang)s)"
+msgstr "Tự động (%(lang)s)"
 
 msgid "Logout"
 msgstr "Đăng xuất"
@@ -664,8 +602,8 @@ msgid "Submission details for evaluation"
 msgstr "Chi tiết chấm bài nộp"
 
 #, python-format
-msgid "Error %d"
-msgstr "Lỗi %d"
+msgid "Error %(status_code)s"
+msgstr "Lỗi %(status_code)s"
 
 msgid "An error occured while the server was handling your request."
 msgstr "Có lỗi xảy ra khi xử lí yêu cầu của bạn."
@@ -837,18 +775,6 @@ msgstr "File"
 msgid "Tokens"
 msgstr "Token"
 
-#, python-format
-msgid "{seconds:g} second"
-msgstr "{seconds:g} giây"
-
-#, python-format
-msgid "{seconds:g} seconds"
-msgstr "{seconds:g} giây"
-
-#, python-format
-msgid "%(mb)d MiB"
-msgstr "%(mb)d MiB"
-
 msgid "Yes"
 msgstr "Có"
 
@@ -860,19 +786,19 @@ msgstr "In"
 
 #, python-format
 msgid ""
-"You can print %(remaining_jobs)d more text or PDF files of up to "
-"%(max_pages)d pages each."
+"You can print %(remaining_jobs)s more text or PDF files of up to "
+"%(max_pages)s pages each."
 msgstr ""
-"Bạn có thể in thêm tối đa %(remaining_jobs)d file văn bản hoặc PDF, mỗi file "
-"dài không quá %(max_pages)d trang."
+"Bạn có thể in thêm tối đa %(remaining_jobs)s file văn bản hoặc PDF, mỗi file "
+"dài không quá %(max_pages)s trang."
 
 #, python-format
 msgid ""
-"You can print %(remaining_jobs)d more text files of up to %(max_pages)d "
+"You can print %(remaining_jobs)s more text files of up to %(max_pages)s "
 "pages each."
 msgstr ""
-"Bạn có thể in thêm tối đa %(remaining_jobs)d file văn bản, mỗi file dài "
-"không quá %(max_pages)d trang."
+"Bạn có thể in thêm tối đa %(remaining_jobs)s file văn bản, mỗi file dài "
+"không quá %(max_pages)s trang."
 
 msgid "File (text or PDF)"
 msgstr "File (văn bản hoặc PDF)"
@@ -966,20 +892,20 @@ msgid "Some suggested translations follow."
 msgstr "Một số bản dịch gợi ý."
 
 #, python-format
-msgid "Statement in <b>%s</b>"
-msgstr "Đề bài theo ngôn ngữ <b>%s</b>"
+msgid "Statement in <b>%(lang)s</b>"
+msgstr "Đề bài theo ngôn ngữ <b>%(lang)s</b>"
 
 #, python-format
-msgid "Statement in %s"
-msgstr "Đề bài theo ngôn ngữ %s"
+msgid "Statement in %(lang)s"
+msgstr "Đề bài theo ngôn ngữ %(lang)s"
 
 #, python-format
-msgid "<b>%s</b>"
-msgstr "<b>%s</b>"
+msgid "<b>%(lang)s</b>"
+msgstr "<b>%(lang)s</b>"
 
 #, python-format
-msgid "%s"
-msgstr "%s"
+msgid "%(lang)s"
+msgstr "%(lang)s"
 
 msgid "Some details"
 msgstr "Chi tiết"

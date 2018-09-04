@@ -24,8 +24,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 
 # As this package initialization code is run by all code that imports
 # something in cms.* it's the best place to setup the logging handlers.
@@ -38,16 +38,18 @@ import cms.log
 
 __all__ = [
     "__version__",
-    "SCORE_MODE_MAX", "SCORE_MODE_MAX_TOKENED_LAST",
+    "TOKEN_MODE_DISABLED", "TOKEN_MODE_FINITE", "TOKEN_MODE_INFINITE",
+    "TOKEN_MODE_MIXED",
+    "FEEDBACK_LEVEL_FULL", "FEEDBACK_LEVEL_RESTRICTED",
     # log
     # Nothing intended for external use, no need to advertise anything.
     # conf
     "Address", "ServiceCoord", "ConfigError", "async_config", "config",
     # util
-    "mkdir", "utf8_decoder", "get_safe_shard", "get_service_address",
+    "mkdir", "rmtree", "utf8_decoder", "get_safe_shard", "get_service_address",
     "get_service_shards", "contest_id_from_args", "default_argument_parser",
     # plugin
-    "plugin_list", "plugin_lookup",
+    "plugin_list",
 ]
 
 
@@ -57,14 +59,27 @@ __version__ = '1.4.dev0'
 # Instantiate or import these objects.
 
 
-# Task score modes.
+# Token modes.
 
-# Maximum score amongst all submissions.
-SCORE_MODE_MAX = "max"
-# Maximum score among all tokened submissions and the last submission.
-SCORE_MODE_MAX_TOKENED_LAST = "max_tokened_last"
+TOKEN_MODE_DISABLED = "disabled"
+TOKEN_MODE_FINITE = "finite"
+TOKEN_MODE_INFINITE = "infinite"
+# Only used when aggregating modes (e.g., for all tasks of a contest).
+# Acts as a "none of the above".
+TOKEN_MODE_MIXED = "mixed"
+
+# Feedback level.
+
+# Full information (killing signals, time and memory, status for all
+# testcases).
+FEEDBACK_LEVEL_FULL = "full"
+# Restricted set of information (no killing signal, time or memory, testcases
+# can be omitted).
+FEEDBACK_LEVEL_RESTRICTED = "restricted"
+
 
 from .conf import Address, ServiceCoord, ConfigError, async_config, config
-from .util import mkdir, utf8_decoder, get_safe_shard, get_service_address, \
-    get_service_shards, contest_id_from_args, default_argument_parser
-from .plugin import plugin_list, plugin_lookup
+from .util import mkdir, rmtree, utf8_decoder, get_safe_shard, \
+    get_service_address, get_service_shards, contest_id_from_args, \
+    default_argument_parser
+from .plugin import plugin_list

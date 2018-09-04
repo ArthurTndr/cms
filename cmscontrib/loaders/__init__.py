@@ -20,17 +20,21 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 from six import itervalues, iteritems
 
 from .italy_yaml import YamlLoader
 from .polygon import PolygonTaskLoader, PolygonUserLoader, PolygonContestLoader
 from .insalgo import ShakerUserLoader
+from .tps import TpsTaskLoader
 
 LOADERS = dict(
     (loader_class.short_name, loader_class) for loader_class in [
-        YamlLoader, PolygonTaskLoader, PolygonUserLoader, PolygonContestLoader, ShakerUserLoader
+        YamlLoader,
+        PolygonTaskLoader, PolygonUserLoader, PolygonContestLoader,
+        ShakerUserLoader,
+        TpsTaskLoader,
     ]
 )
 

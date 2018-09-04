@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""This script creates a new user in the database.
+"""This script creates a new participation in the database.
 
 """
 
@@ -27,13 +27,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 
 # We enable monkey patching to make many libraries gevent-friendly
 # (for instance, urllib3, used by requests)
 import gevent.monkey
-gevent.monkey.patch_all()
+gevent.monkey.patch_all()  # noqa
 
 import argparse
 import datetime
@@ -153,12 +153,13 @@ def main():
     if args.contest_id is None:
         args.contest_id = ask_for_contest()
 
-    success = add_participation(args.username, args.contest_id,
-                                args.ip, args.delay_time, args.extra_time,
-                                args.plaintext_password or args.hashed_password,
-                                args.method or "plaintext",
-                                args.hashed_password is not None, args.team,
-                                args.hidden, args.unrestricted)
+    success = add_participation(
+        args.username, args.contest_id,
+        args.ip, args.delay_time, args.extra_time,
+        args.plaintext_password or args.hashed_password,
+        args.method or "plaintext",
+        args.hashed_password is not None, args.team,
+        args.hidden, args.unrestricted)
     return 0 if success is True else 1
 
 

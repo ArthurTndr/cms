@@ -20,7 +20,7 @@ msgstr ""
 msgid "Compilation succeeded"
 msgstr "Успешно компилиране"
 
-msgid "Your submission successfully compiled to an excutable."
+msgid "Your submission successfully compiled to an executable."
 msgstr "Вашето решение успешно се компилира до програма."
 
 msgid "Compilation failed"
@@ -42,7 +42,7 @@ msgid ""
 "Compilation killed with signal %s (could be triggered by violating memory "
 "limits)"
 msgstr ""
-"Компилирането беше прекратено със сигнал %d (може да бъде причинено от "
+"Компилирането беше прекратено със сигнал %s (може да бъде причинено от "
 "нарушаване на ограниченията за памет)"
 
 msgid ""
@@ -108,27 +108,6 @@ msgstr ""
 "отбележете, че показаната използвана памет в детайлите на решението е от преди"
 "заделянето на памет, което е предизвикало сигнала."
 
-#, python-format
-msgid "Execution killed because of forbidden syscall %s"
-msgstr "Изпълнението е прекратено поради използването на забранена системна функция"
-
-msgid ""
-"Your submission was killed because it tried to use the forbidden syscall "
-"specified in the message."
-msgstr ""
-"Изпълнението на програмата беше прекратено, защото тя се опита да използва"
-"забранената системна функция указана в съобщението."
-
-msgid "Execution killed because of forbidden file access"
-msgstr ""
-"Изпълнението на вашата програма беше прекратено поради забранен достъп"
-"до файлове"
-
-msgid ""
-"Your submission was killed because it tried to read or write a forbidden "
-"file."
-msgstr ""
-
 msgid "Execution failed because the return code was nonzero"
 msgstr "Изпълнението се провали, защото програмата върна ненулев резултат."
 
@@ -140,8 +119,8 @@ msgid "N/A"
 msgstr "Неизвестно"
 
 #, python-format
-msgid "Subtask %d"
-msgstr "Подзадача %d"
+msgid "Subtask %(index)s"
+msgstr "Подзадача %(index)s"
 
 msgid "Outcome"
 msgstr "Резултат"
@@ -343,10 +322,6 @@ msgstr "Изпълняване"
 msgid "Executed"
 msgstr "Изпълнено"
 
-#, python-format
-msgid "{seconds:0.3f} s"
-msgstr ""
-
 msgid "Too many print jobs!"
 msgstr "Твърде много задачи за принтиране!"
 
@@ -373,49 +348,8 @@ msgstr ""
 msgid "Your print job has been received."
 msgstr ""
 
-msgid "%Y-%m-%d"
-msgstr ""
-
-msgid "%H:%M:%S"
-msgstr ""
-
-msgid "%Y-%m-%d %H:%M:%S"
-msgstr ""
-
 msgid "loading..."
 msgstr "зареждане..."
-
-#, python-format
-msgid "%d second"
-msgid_plural "%d seconds"
-msgstr[0] "%d секунда"
-msgstr[1] "%d секунди"
-
-#, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d минута"
-msgstr[1] "%d минути"
-
-#, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d час"
-msgstr[1] "%d часа"
-
-#, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d ден"
-msgstr[1] "%d дни"
-
-#, python-format
-msgid "%s and %s"
-msgstr "%d и %d"
-
-#, python-format
-msgid "more than %s"
-msgstr "повече от %s"
 
 msgid "contest-token"
 msgstr ""
@@ -509,8 +443,8 @@ msgid "You have no limitations on how you use them."
 msgstr ""
 
 #, python-format
-msgid "Automatic (%s)"
-msgstr "Автоматично (%s)"
+msgid "Automatic (%(lang)s)"
+msgstr "Автоматично (%(lang)s)"
 
 #, python-format
 msgid ""
@@ -642,8 +576,8 @@ msgid "Submission details for evaluation"
 msgstr "Детайли на решенията"
 
 #, python-format
-msgid "Error %d"
-msgstr "Грешка %d"
+msgid "Error %(status_code)s"
+msgstr "Грешка %(status_code)s"
 
 msgid "An error occured while the server was handling your request."
 msgstr "Възникна грешка докато сървърът се опитваше да обработи вашата заявка"
@@ -791,18 +725,6 @@ msgstr "Файлове"
 msgid "Tokens"
 msgstr "Жетони"
 
-#, python-format
-msgid "{seconds:g} second"
-msgstr "{seconds:g} секунди"
-
-#, python-format
-msgid "{seconds:g} seconds"
-msgstr "{seconds:g} секунди"
-
-#, python-format
-msgid "%(mb)d MiB"
-msgstr ""
-
 msgid "Yes"
 msgstr "Да"
 
@@ -814,13 +736,13 @@ msgstr "Принтирай"
 
 #, python-format
 msgid ""
-"You can print %(remaining_jobs)d more text or PDF files of up to "
-"%(max_pages)d pages each."
+"You can print %(remaining_jobs)s more text or PDF files of up to "
+"%(max_pages)s pages each."
 msgstr ""
 
 #, python-format
 msgid ""
-"You can print %(remaining_jobs)d more text files of up to %(max_pages)d "
+"You can print %(remaining_jobs)s more text files of up to %(max_pages)s "
 "pages each."
 msgstr ""
 
@@ -919,20 +841,20 @@ msgid "Some suggested translations follow."
 msgstr ""
 
 #, python-format
-msgid "Statement in <b>%s</b>"
-msgstr "Условие на <b>%s</b>"
+msgid "Statement in <b>%(lang)s</b>"
+msgstr "Условие на <b>%(lang)s</b>"
 
 #, python-format
-msgid "Statement in %s"
-msgstr "Условие на %s"
+msgid "Statement in %(lang)s"
+msgstr "Условие на %(lang)s"
 
 #, python-format
-msgid "<b>%s</b>"
-msgstr ""
+msgid "<b>%(lang)s</b>"
+msgstr "<b>%(lang)s</b>"
 
 #, python-format
-msgid "%s"
-msgstr ""
+msgid "%(lang)s"
+msgstr "%(lang)s"
 
 msgid "Some details"
 msgstr "Някои детайли"

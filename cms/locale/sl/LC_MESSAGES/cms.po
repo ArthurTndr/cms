@@ -21,7 +21,7 @@ msgstr ""
 msgid "Compilation succeeded"
 msgstr "Prevajanje uspešno zaključeno"
 
-msgid "Your submission successfully compiled to an excutable."
+msgid "Your submission successfully compiled to an executable."
 msgstr "Tvoja oddaja se je uspešno prevedla v izvršno datoteko."
 
 msgid "Compilation failed"
@@ -87,19 +87,6 @@ msgstr "Izvajanje je bilo prekinjeno s signalom %s (lahko je posledica prekorač
 msgid "Your submission was killed with the specified signal. Among other things, this might be caused by exceeding the memory limit. Note that if this is the reason, the memory usage visible in the submission details is the usage before the allocation that caused the signal."
 msgstr "Tvoja oddaja je bila prekinjena s specifičnim signalom. Med drugim je to lahko posledica prekoračitve spominske omejitve. V tem primeru je porabljen spomin, ki je viden pri podrobnostih o oddaji, tisti spomin, ki je bil uporabljen pred dodelitvijo, ki je sporžila signal."
 
-#, python-format
-msgid "Execution killed because of forbidden syscall %s"
-msgstr "Izvajanje je bilo prekinjeno zaradi prepovedanega sistemskega klica %s"
-
-msgid "Your submission was killed because it tried to use the forbidden syscall specified in the message."
-msgstr "Tvoja oddaja je bila prekinjena, ker je poizkušala uporabiti prepovedan sistemski klic omenjen v sporočilu."
-
-msgid "Execution killed because of forbidden file access"
-msgstr "Izvajanje prekinjeno zaradi prepovedanega dostopa do datoteke"
-
-msgid "Your submission was killed because it tried to read or write a forbidden file."
-msgstr "Tvoja oddaja je bila prekinjena, ker je poizkušala brati iz ali pisati v prepovedano datoteko."
-
 msgid "Execution failed because the return code was nonzero"
 msgstr "Izvajanje je spodletelo, ker se je končala z neničelno kodo"
 
@@ -110,8 +97,8 @@ msgid "N/A"
 msgstr "Ni odgovora"
 
 #, python-format
-msgid "Subtask %d"
-msgstr "Podnaloga %d"
+msgid "Subtask %(index)s"
+msgstr "Podnaloga %(index)s"
 
 msgid "Outcome"
 msgstr "Rezultat"
@@ -146,57 +133,8 @@ msgstr "Prevajanje ni potrebno"
 msgid "File not submitted"
 msgstr "Datoteka ni bila oddana"
 
-msgid "%Y-%m-%d"
-msgstr "%d. %m. %Y"
-
-msgid "%H:%M:%S"
-msgstr "%H:%M:%S"
-
-msgid "%Y-%m-%d %H:%M:%S"
-msgstr "%d. %m. %Y %H:%M:%S"
-
 msgid "loading..."
 msgstr "nalagam..."
-
-#, python-format
-msgid "%d second"
-msgid_plural "%d seconds"
-msgstr[0] "%d sekunda"
-msgstr[1] "%d sekundi"
-msgstr[2] "%d sekunde"
-msgstr[3] "%d sekund"
-
-#, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minuta"
-msgstr[1] "%d minuti"
-msgstr[2] "%d minute"
-msgstr[3] "%d minut"
-
-#, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d ura"
-msgstr[1] "%d uri"
-msgstr[2] "%d ure"
-msgstr[3] "%d ur"
-
-#, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d dan"
-msgstr[1] "%d dneva"
-msgstr[2] "%d dnevi"
-msgstr[3] "%d dni"
-
-#, python-format
-msgid "%s and %s"
-msgstr "%s in %s"
-
-#, python-format
-msgid "more than %s"
-msgstr "več kot %s"
 
 msgid "contest-token"
 msgstr "tekmovalni-žeton"
@@ -498,12 +436,8 @@ msgid "Executed"
 msgstr "Izvedeno"
 
 #, python-format
-msgid "{seconds:0.3f} s"
-msgstr "{seconds:0.3f} s"
-
-#, python-format
-msgid "Automatic (%s)"
-msgstr "Avtomatsko (%s)"
+msgid "Automatic (%(lang)s)"
+msgstr "Avtomatsko (%(lang)s)"
 
 #, python-format
 msgid "Logged in as <strong>%(first_name)s %(last_name)s</strong> <em>(%(username)s)</em>"
@@ -631,8 +565,8 @@ msgid "Submission details for evaluation"
 msgstr "Podrobnosti oddaje o ovrednotenju"
 
 #, python-format
-msgid "Error %d"
-msgstr "Napaka %d"
+msgid "Error %(status_code)s"
+msgstr "Napaka %(status_code)s"
 
 msgid "An error occured while the server was handling your request."
 msgstr "Napaka se je zgodila med tem ko je strežnik obravnaval tvojo zahtevo."
@@ -757,18 +691,6 @@ msgstr "Datoteke"
 msgid "Tokens"
 msgstr "Žetoni"
 
-#, python-format
-msgid "{seconds:g} second"
-msgstr "{seconds:g} sekunda"
-
-#, python-format
-msgid "{seconds:g} seconds"
-msgstr "{seconds:g} sekund"
-
-#, python-format
-msgid "%(mb)d MiB"
-msgstr "%(mb)d MiB"
-
 msgid "Yes"
 msgstr "Da"
 
@@ -779,12 +701,12 @@ msgid "Print"
 msgstr "Tiskaj"
 
 #, python-format
-msgid "You can print %(remaining_jobs)d more text or PDF files of up to %(max_pages)d pages each."
-msgstr "Natisneš lahko še %(remaining_jobs)d besedilnih ali PDF datotek z največ %(max_pages)d stranmi."
+msgid "You can print %(remaining_jobs)s more text or PDF files of up to %(max_pages)s pages each."
+msgstr "Natisneš lahko še %(remaining_jobs)s besedilnih ali PDF datotek z največ %(max_pages)s stranmi."
 
 #, python-format
-msgid "You can print %(remaining_jobs)d more text files of up to %(max_pages)d pages each."
-msgstr "Natisneš lahko še %(remaining_jobs)d besedilnih datotek z največ %(max_pages)d stranmi."
+msgid "You can print %(remaining_jobs)s more text files of up to %(max_pages)s pages each."
+msgstr "Natisneš lahko še %(remaining_jobs)s besedilnih datotek z največ %(max_pages)s stranmi."
 
 msgid "File (text or PDF)"
 msgstr "Datoteka (besedilna ali PDF)"
@@ -875,20 +797,20 @@ msgid "Some suggested translations follow."
 msgstr "Nekaj predlaganih prevodov še sledi."
 
 #, python-format
-msgid "Statement in <b>%s</b>"
-msgstr "Besedilo v <b>%s</b>"
+msgid "Statement in <b>%(lang)s</b>"
+msgstr "Besedilo v <b>%(lang)s</b>"
 
 #, python-format
-msgid "Statement in %s"
-msgstr "Besedilo v %s"
+msgid "Statement in %(lang)s"
+msgstr "Besedilo v %(lang)s"
 
 #, python-format
-msgid "<b>%s</b>"
-msgstr "<b>%s</b>"
+msgid "<b>%(lang)s</b>"
+msgstr "<b>%(lang)s</b>"
 
 #, python-format
-msgid "%s"
-msgstr "%s"
+msgid "%(lang)s"
+msgstr "%(lang)s"
 
 msgid "Some details"
 msgstr "Nekaj podrobnosti"

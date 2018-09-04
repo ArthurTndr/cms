@@ -30,9 +30,9 @@ msgstr "編譯逾時"
 
 #, python-format
 msgid ""
-"Compilation killed with signal %d (could be triggered by violating memory "
+"Compilation killed with signal %s (could be triggered by violating memory "
 "limits)"
-msgstr "編譯程式因記憶體違規存取而強制終止 (信號 %d)"
+msgstr "編譯程式因記憶體違規存取而強制終止 (信號 %s)"
 
 msgid "Execution timed out"
 msgstr "超過時間限制"
@@ -42,13 +42,6 @@ msgid ""
 "Execution killed with signal %s (could be triggered by violating memory "
 "limits)"
 msgstr "測試程式因記憶體違規存取而強制終止 (信號 %s)"
-
-#, python-format
-msgid "Execution killed because of forbidden syscall %s"
-msgstr "測試程式因違規存取系統函數 %s 而強制終止"
-
-msgid "Execution killed because of forbidden file access"
-msgstr "測試程式因違規存取檔案系統而強制終止"
 
 msgid "Execution failed because the return code was nonzero"
 msgstr "執行失敗: 程式回傳值非零"
@@ -64,8 +57,8 @@ msgid "Evaluation didn't produce file %s"
 msgstr "執行後並未產生檔案 %s"
 
 #, python-format
-msgid "Subtask %d"
-msgstr "子問題 %d"
+msgid "Subtask %(index)s"
+msgstr "子問題 %(index)s"
 
 msgid "Outcome"
 msgstr "評測結果"
@@ -265,53 +258,8 @@ msgstr "執行中..."
 msgid "Executed"
 msgstr "已評測"
 
-#, python-format
-msgid "{seconds:0.3f} s"
-msgstr "{seconds:0.3f} 秒"
-
-msgid "%Y-%m-%d"
-msgstr "%Y-%m-%d"
-
-msgid "%H:%M:%S"
-msgstr "%H:%M:%S"
-
-msgid "%Y-%m-%d %H:%M:%S"
-msgstr "%Y-%m-%d %H:%M:%S"
-
 msgid "loading..."
 msgstr "載入中..."
-
-#, python-format
-msgid "%d second"
-msgid_plural "%d seconds"
-msgstr[0] "%d 秒"
-msgstr[1] "%d 秒"
-
-#, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d 分鐘"
-msgstr[1] "%d 分鐘"
-
-#, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d 小時"
-msgstr[1] "%d 小時"
-
-#, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d 天"
-msgstr[1] "%d 天"
-
-#, python-format
-msgid "%s and %s"
-msgstr "%s 與 %s"
-
-#, python-format
-msgid "more than %s"
-msgstr "超過 %s"
 
 msgid "contest-token"
 msgstr "競賽-Token"
@@ -405,8 +353,8 @@ msgid "You have no limitations on how you use them."
 msgstr "使用規則中沒有其他額外的限制."
 
 #, python-format
-msgid "Automatic (%s)"
-msgstr "自動偵測 (%s)"
+msgid "Automatic (%(lang)s)"
+msgstr "自動偵測 (%(lang)s)"
 
 #, python-format
 msgid ""
@@ -519,8 +467,8 @@ msgid "Standard Template Library"
 msgstr "STL 標準樣板函數庫"
 
 #, python-format
-msgid "Error %d"
-msgstr "錯誤 %d"
+msgid "Error %(status_code)s"
+msgstr "錯誤 %(status_code)s"
 
 msgid "An error occured while the server was handling your request."
 msgstr "競賽系統伺服器發生錯誤."
@@ -661,18 +609,6 @@ msgstr "傳送檔案"
 msgid "Tokens"
 msgstr ""
 
-#, python-format
-msgid "{seconds:g} second"
-msgstr "{seconds:g} 秒"
-
-#, python-format
-msgid "{seconds:g} seconds"
-msgstr "{seconds:g} 秒"
-
-#, python-format
-msgid "%(mb)d MiB"
-msgstr ""
-
 msgid "Yes"
 msgstr "是"
 
@@ -737,20 +673,20 @@ msgid "Some suggested translations follow."
 msgstr "推薦翻譯版本如下."
 
 #, python-format
-msgid "Statement in <b>%s</b>"
-msgstr "題目敘述 in <b>%s</b>"
+msgid "Statement in <b>%(lang)s</b>"
+msgstr "題目敘述 in <b>%(lang)s</b>"
 
 #, python-format
-msgid "Statement in %s"
-msgstr "題目敘述 in %s"
+msgid "Statement in %(lang)s"
+msgstr "題目敘述 in %(lang)s"
 
 #, python-format
-msgid "<b>%s</b>"
-msgstr ""
+msgid "<b>%(lang)s</b>"
+msgstr "<b>%(lang)s</b>"
 
 #, python-format
-msgid "%s"
-msgstr ""
+msgid "%(lang)s"
+msgstr "%(lang)s"
 
 msgid "Some details"
 msgstr "詳細資訊"

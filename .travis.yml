@@ -18,33 +18,19 @@ addons:
       - php5-cli
       - haskell-platform
       - fp-compiler
-      - fp-units-base
-      - fp-units-fcl
-      - fp-units-misc
-      - fp-units-math
-      - fp-units-rtl
       - postgresql-client
-      - gettext
       - python2.7
-      - iso-codes
-      - shared-mime-info
-      - stl-manual
+      - cppreference-doc-en-html
       - cgroup-lite
       - libcap-dev
       - python-dev
       - libpq-dev
       - libcups2-dev
       - libyaml-dev
-      - wget
+      - rustc
       - mono-mcs
 
 install:
-  - wget "https://static.rust-lang.org/dist/rust-1.15.1-x86_64-unknown-linux-gnu.tar.gz"
-  - tar xf rust-1.15.1-x86_64-unknown-linux-gnu.tar.gz
-  - pushd rust-1.15.1-x86_64-unknown-linux-gnu
-  - sudo ./install.sh --prefix=/usr
-  - popd
-
   - pip install -r requirements.txt
   - pip install -r dev-requirements.txt
 
@@ -68,7 +54,7 @@ before_script:
   - cmsInitDB
 
 script:
-  - cmsRunTests -v
+  - cmsRunTests -v --coverage --codecov
 
 notifications:
   email: no

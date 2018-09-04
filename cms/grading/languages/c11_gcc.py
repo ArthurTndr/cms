@@ -23,8 +23,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 
 from cms.grading import CompiledLanguage
 
@@ -65,7 +65,7 @@ class C11Gcc(CompiledLanguage):
         command = ["/usr/bin/gcc"]
         if for_evaluation:
             command += ["-DEVAL"]
-        command += ["-std=c11", "-O2", "-pipe", "-static",
+        command += ["-std=gnu11", "-O2", "-pipe", "-static",
                     "-s", "-o", executable_filename]
         command += source_filenames
         command += ["-lm"]

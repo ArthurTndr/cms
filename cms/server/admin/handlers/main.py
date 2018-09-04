@@ -30,15 +30,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 
 import json
 import logging
 
 from cms import ServiceCoord, get_service_shards, get_service_address
 from cms.db import Admin, Contest, Question
-from cms.server import filter_ascii
 from cmscommon.crypto import validate_password
 from cmscommon.datetime import make_datetime, make_timestamp
 
@@ -79,23 +78,23 @@ class LoginHandler(SimpleHandler("login.html", authenticated=False)):
         try:
             allowed = validate_password(admin.authentication, password)
         except ValueError:
-            logger.warning("Unable to validate password for admin %s",
-                           filter_ascii(username), exc_info=True)
+            logger.warning("Unable to validate password for admin %r", username,
+                           exc_info=True)
             allowed = False
 
         if not allowed or not admin.enabled:
             if not allowed:
-                logger.info("Login error for admin %s from IP %s.",
-                            filter_ascii(username), self.request.remote_ip)
+                logger.info("Login error for admin %r from IP %s.", username,
+                            self.request.remote_ip)
             elif not admin.enabled:
-                logger.info("Login successful for admin %s from IP %s, "
-                            "but account is disabled.",
-                            filter_ascii(username), self.request.remote_ip)
+                logger.info("Login successful for admin %r from IP %s, but "
+                            "account is disabled.", username,
+                            self.request.remote_ip)
             self.redirect(error_page)
             return
 
-        logger.info("Admin logged in: %s from IP %s.",
-                    filter_ascii(username), self.request.remote_ip)
+        logger.info("Admin logged in: %r from IP %s.", username,
+                    self.request.remote_ip)
         self.service.auth_handler.set(admin.id)
         self.redirect(next_page)
 
@@ -155,9 +154,9 @@ class NotificationsHandler(BaseHandler):
         # Keep "== None" in filter arguments. SQLAlchemy does not
         # understand "is None".
         questions = self.sql_session.query(Question)\
-            .filter(Question.reply_timestamp == None)\
+            .filter(Question.reply_timestamp.is_(None))\
             .filter(Question.question_timestamp > last_notification)\
-            .all()  # noqa
+            .all()
 
         for question in questions:
             res.append({

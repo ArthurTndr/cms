@@ -33,19 +33,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
-from six import itervalues
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 
 import logging
 
 import tornado.web
 
-from cms.server import actual_phase_required, multi_contest
-from cmscommon.isocodes import is_language_code, translate_language_code, \
-    is_country_code, translate_country_code, \
-    is_language_country_code, translate_language_country_code
+from cms.server import multi_contest
 from cmscommon.mimetypes import get_type_for_file_name
+
+from ..phase_management import actual_phase_required
 
 from .contest import ContestHandler, FileHandler
 
@@ -61,34 +59,9 @@ class TaskDescriptionHandler(ContestHandler):
     @actual_phase_required(0, 3)
     @multi_contest
     def get(self, task_name):
-        try:
-            task = self.contest.get_task(task_name)
-        except KeyError:
+        task = self.get_task(task_name)
+        if task is None:
             raise tornado.web.HTTPError(404)
-
-        for statement in itervalues(task.statements):
-            lang_code = statement.language
-            if is_language_country_code(lang_code):
-                statement.language_name = \
-                    translate_language_country_code(lang_code, self.locale)
-            elif is_language_code(lang_code):
-                statement.language_name = \
-                    translate_language_code(lang_code, self.locale)
-            elif is_country_code(lang_code):
-                statement.language_name = \
-                    translate_country_code(lang_code, self.locale)
-            else:
-                statement.language_name = lang_code
-
-        self.r_params["primary_statements"] = task.primary_statements
-
-        try:
-            self.r_params["user_primary"] = \
-                self.current_user.user.preferred_languages
-        except ValueError as e:
-            self.r_params["user_primary"] = []
-            logger.error("Preferred languages for user %s is invalid [%r].",
-                         self.current_user.user.username, e)
 
         self.render("task_description.html", task=task, **self.r_params)
 
@@ -101,9 +74,8 @@ class TaskStatementViewHandler(FileHandler):
     @actual_phase_required(0, 3)
     @multi_contest
     def get(self, task_name, lang_code):
-        try:
-            task = self.contest.get_task(task_name)
-        except KeyError:
+        task = self.get_task(task_name)
+        if task is None:
             raise tornado.web.HTTPError(404)
 
         if lang_code not in task.statements:
@@ -128,9 +100,8 @@ class TaskAttachmentViewHandler(FileHandler):
     @actual_phase_required(0, 3)
     @multi_contest
     def get(self, task_name, filename):
-        try:
-            task = self.contest.get_task(task_name)
-        except KeyError:
+        task = self.get_task(task_name)
+        if task is None:
             raise tornado.web.HTTPError(404)
 
         if filename not in task.attachments:

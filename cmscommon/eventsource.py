@@ -21,14 +21,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 
 import re
 import time
 from collections import deque
 from weakref import WeakSet
 
+from future.utils import text_to_native_str
 from gevent import Timeout
 from gevent.queue import Queue, Empty
 from gevent.pywsgi import WSGIHandler
@@ -271,7 +272,7 @@ class EventSource(object):
         # transfer-encoding. The PEP states just that "the server *may*
         # use chunked encoding" to send each piece of data we give it,
         # if we don't specify a Content-Length header and if both the
-        # client and the server support it. Accoring to the HTTP spec.
+        # client and the server support it. According to the HTTP spec.
         # all (and only) HTTP/1.1 compliant clients have to support it.
         # We'll assume that the server software supports it too, and
         # actually uses it (gevent does!) even if we have no way to
@@ -291,7 +292,7 @@ class EventSource(object):
         # the previous one) is that no one in the application-to-client
         # chain does response buffering: neither any middleware nor the
         # server (gevent doesn't!). This should also hold outside the
-        # server realm (i.e. no proxy buffering) but that's definetly
+        # server realm (i.e. no proxy buffering) but that's definitely
         # not our responsibility.
 
         # The fourth "hack" is to avoid an error to be printed on the
@@ -303,18 +304,20 @@ class EventSource(object):
         # server and make it "forget" this was a chunked response.
 
         # Check if the client will understand what we will produce.
-        if request.accept_mimetypes.quality(b"text/event-stream") <= 0:
+        if request.accept_mimetypes.quality("text/event-stream") <= 0:
             return NotAcceptable()(environ, start_response)
 
         # Initialize the response and get the write() callback. The
         # Cache-Control header is useless for conforming clients, as
         # the spec. already imposes that behavior on them, but we set
-        # it explictly to avoid unwanted caching by unaware proxies and
+        # it explicitly to avoid unwanted caching by unaware proxies and
         # middlewares.
         write = start_response(
-            b"200 OK",
-            [(b"Content-Type", b"text/event-stream; charset=utf-8"),
-             (b"Cache-Control", b"no-cache")])
+            text_to_native_str("200 OK"),
+            [(text_to_native_str("Content-Type"),
+              text_to_native_str("text/event-stream; charset=utf-8")),
+             (text_to_native_str("Cache-Control"),
+              text_to_native_str("no-cache"))])
 
         # This is a part of the fourth hack (see above).
         if hasattr(start_response, "__self__") and \
@@ -331,7 +334,7 @@ class EventSource(object):
         # XMLHttpRequest it has been probably sent from a polyfill (not
         # from the native browser implementation) which will be able to
         # read the response body only when it has been fully received.
-        if environ[b"SERVER_PROTOCOL"] != b"HTTP/1.1" or request.is_xhr:
+        if environ["SERVER_PROTOCOL"] != "HTTP/1.1" or request.is_xhr:
             one_shot = True
         else:
             one_shot = False
@@ -346,11 +349,9 @@ class EventSource(object):
         # the EventSource and create a new one. To obtain that behavior
         # again we give the "last_event_id" as a URL query parameter
         # (with lower priority, to have the header override it).
-        last_event_id = request.headers.get(b"Last-Event-ID",
-                                            type=lambda x: x.decode('utf-8'))
+        last_event_id = request.headers.get("Last-Event-ID")
         if last_event_id is None:
-            last_event_id = request.args.get(b"last_event_id",
-                                             type=lambda x: x.decode('utf-8'))
+            last_event_id = request.args.get("last_event_id")
 
         # We subscribe to the publisher to receive events.
         sub = self._pub.get_subscriber(last_event_id)

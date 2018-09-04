@@ -21,8 +21,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 from six import iteritems
 
 import logging
@@ -60,6 +60,9 @@ def import_testcases_from_zipfile(
             tests = dict()
             # Match input/output file names to testcases' codenames.
             for filename in archive_zfp.namelist():
+                # In py2, filename is either str (if ASCII) or unicode.
+                # Cast it to a consistent type, compatible with py3.
+                filename = str(filename)
                 match = input_re.match(filename)
                 if match:
                     codename = match.group(1)

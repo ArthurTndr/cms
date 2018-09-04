@@ -19,7 +19,7 @@
 
 """A class to update a dump created by CMS.
 
-Used by ContestImporter and DumpUpdater.
+Used by DumpImporter and DumpUpdater.
 
 This adapts the dump to some changes in the model introduced in the
 commit that created this same file and in commit
@@ -31,8 +31,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 from six import iteritems
 
 import json
@@ -54,7 +54,7 @@ def parse_compilation_text(s):
     text = [{'OK': "Compilation succeeded",
              'Failed': "Compilation failed",
              'Time': "Compilation timed out",
-             'Killed': "Compilation killed with signal %d (could be triggered "
+             'Killed': "Compilation killed with signal %s (could be triggered "
                        "by violating memory limits)"}[status[0]]]
     if status[0] == "Killed":
         text += [int(status[-1])]
@@ -80,7 +80,7 @@ def parse_evaluation_text(s):
     if "tion didn't produce file " in s:
         res = ["Evaluation didn't produce file %s", ' '.join(s.split(' ')[4:])]
     elif s.startswith("Execution killed with signal "):
-        res = ["Execution killed with signal %d (could be triggered by "
+        res = ["Execution killed with signal %s (could be triggered by "
                "violating memory limits)", int(s.rpartition(' ')[2][:-1])]
     elif s.startswith("Execution killed because of forbidden syscall "):
         res = ["Execution killed because of forbidden syscall %s",
@@ -114,7 +114,7 @@ class Updater(object):
         self.objs = data
 
     def run(self):
-        for k, v iteritems(in self.objs):
+        for k, v in iteritems(self.objs):
             if k.startswith("_"):
                 continue
 

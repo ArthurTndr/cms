@@ -22,15 +22,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 
 task_info = {
     "name": "batchstdio",
     "title": "Test Batch Task with stdin/stdout",
     "official_language": "",
     "submission_format_choice": "other",
-    "submission_format": "[\"batchstdio.%l\"]",
+    "submission_format": "batchstdio.%l",
     "time_limit_{{dataset_id}}": "0.5",
     "memory_limit_{{dataset_id}}": "128",
     "task_type_{{dataset_id}}": "Batch",

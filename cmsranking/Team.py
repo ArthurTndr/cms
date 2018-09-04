@@ -21,12 +21,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 
 from cmsranking.Entity import Entity, InvalidData
-from cmsranking.Store import Store
-from cmsranking.User import store as user_store
 
 
 class Team(Entity):
@@ -68,6 +66,3 @@ class Team(Entity):
         result = self.__dict__.copy()
         del result['key']
         return result
-
-
-store = Store(Team, 'teams', [user_store])

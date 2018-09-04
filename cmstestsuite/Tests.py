@@ -3,7 +3,7 @@
 
 # Contest Management System - http://cms-dev.github.io/
 # Copyright © 2012 Bernard Blackham <bernard@largestprime.net>
-# Copyright © 2013-2017 Stefano Maggiolo <s.maggiolo@gmail.com>
+# Copyright © 2013-2018 Stefano Maggiolo <s.maggiolo@gmail.com>
 # Copyright © 2014-2015 Giovanni Mascellani <mascellani@poisson.phc.unipi.it>
 # Copyright © 2016 Masaki Hara <ackie.h.gmai@gmail.com>
 #
@@ -24,14 +24,18 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 
 import cmstestsuite.tasks.batch_stdio as batch_stdio
 import cmstestsuite.tasks.batch_fileio as batch_fileio
 import cmstestsuite.tasks.batch_fileio_managed as batch_fileio_managed
 import cmstestsuite.tasks.communication as communication
-import cmstestsuite.tasks.communication2 as communication2
+import cmstestsuite.tasks.communication_many as communication_many
+import cmstestsuite.tasks.outputonly as outputonly
+import cmstestsuite.tasks.outputonly_comparator as outputonly_comparator
+import cmstestsuite.tasks.twosteps as twosteps
+import cmstestsuite.tasks.twosteps_comparator as twosteps_comparator
 
 from cmstestsuite.Test import Test, CheckOverallScore, CheckCompilationFail, \
     CheckTimeout, CheckTimeoutWall, CheckNonzeroReturn
@@ -117,6 +121,41 @@ ALL_TESTS = [
          task=batch_fileio, filenames=['incorrect-fileio-with-stdio.%l'],
          languages=ALL_LANGUAGES,
          checks=[CheckOverallScore(0, 100)]),
+
+    # OutputOnly tasks
+
+    Test('correct-outputonly',
+         task=outputonly, filenames=['correct-outputonly-000.txt',
+                                     'correct-outputonly-001.txt'],
+         languages=[None], checks=[CheckOverallScore(100, 100)]),
+
+    Test('incorrect-outputonly',
+         task=outputonly, filenames=['incorrect-outputonly-000.txt',
+                                     'incorrect-outputonly-001.txt'],
+         languages=[None], checks=[CheckOverallScore(0, 100)]),
+
+    Test('partial-correct-outputonly',
+         task=outputonly, filenames=['correct-outputonly-000.txt',
+                                     'incorrect-outputonly-001.txt'],
+         languages=[None], checks=[CheckOverallScore(50, 100)]),
+
+    Test('correct-outputonly-comparator',
+         task=outputonly_comparator,
+         filenames=['correct-outputonly-000.txt',
+                    'correct-outputonly-001.txt'],
+         languages=[None], checks=[CheckOverallScore(100, 100)]),
+
+    Test('incorrect-outputonly-comparator',
+         task=outputonly_comparator,
+         filenames=['incorrect-outputonly-000.txt',
+                    'incorrect-outputonly-001.txt'],
+         languages=[None], checks=[CheckOverallScore(0, 100)]),
+
+    Test('partial-correct-outputonly-comparator',
+         task=outputonly_comparator,
+         filenames=['correct-outputonly-000.txt',
+                    'incorrect-outputonly-001.txt'],
+         languages=[None], checks=[CheckOverallScore(50, 100)]),
 
     # Failed compilation.
 
@@ -223,16 +262,56 @@ ALL_TESTS = [
 
     # Communication tasks with two processes.
 
-    Test('communication2-correct',
-         task=communication2, filenames=['communication2-correct-user1.%l',
-                                         'communication2-correct-user2.%l'],
+    Test('communication-many-correct',
+         task=communication_many,
+         filenames=['communication-many-correct-user1.%l',
+                    'communication-many-correct-user2.%l'],
          languages=(LANG_C, LANG_CPP, LANG_PASCAL, LANG_JAVA),
          checks=[CheckOverallScore(100, 100)]),
 
-    Test('communication2-incorrect',
-         task=communication2, filenames=['communication2-incorrect-user1.%l',
-                                         'communication2-incorrect-user2.%l'],
+    Test('communication-many-incorrect',
+         task=communication_many,
+         filenames=['communication-many-incorrect-user1.%l',
+                    'communication-many-incorrect-user2.%l'],
          languages=(LANG_C, LANG_CPP, LANG_PASCAL, LANG_JAVA),
+         checks=[CheckOverallScore(0, 100)]),
+
+    # TwoSteps
+
+    Test('twosteps-correct',
+         task=twosteps, filenames=["twosteps-correct-first.%l",
+                                   "twosteps-correct-second.%l"],
+         languages=(LANG_C, ),
+         checks=[CheckOverallScore(100, 100)]),
+
+    Test('twosteps-half-correct',
+         task=twosteps, filenames=["twosteps-half-correct-first.%l",
+                                   "twosteps-correct-second.%l"],
+         languages=(LANG_C,),
+         checks=[CheckOverallScore(50, 100)]),
+
+    Test('twosteps-incorrect',
+         task=twosteps, filenames=["twosteps-incorrect-first.%l",
+                                   "twosteps-correct-second.%l"],
+         languages=(LANG_C,),
+         checks=[CheckOverallScore(0, 100)]),
+
+    Test('twosteps-comparator-correct',
+         task=twosteps_comparator, filenames=["twosteps-correct-first.%l",
+                                              "twosteps-correct-second.%l"],
+         languages=(LANG_C,),
+         checks=[CheckOverallScore(100, 100)]),
+
+    Test('twosteps-comparator-half-correct',
+         task=twosteps_comparator, filenames=["twosteps-half-correct-first.%l",
+                                              "twosteps-correct-second.%l"],
+         languages=(LANG_C,),
+         checks=[CheckOverallScore(50, 100)]),
+
+    Test('twosteps-comparator-incorrect',
+         task=twosteps_comparator, filenames=["twosteps-incorrect-first.%l",
+                                              "twosteps-correct-second.%l"],
+         languages=(LANG_C,),
          checks=[CheckOverallScore(0, 100)]),
 
     # Writing to files not allowed.

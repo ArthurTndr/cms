@@ -3,7 +3,7 @@
 
 # Contest Management System - http://cms-dev.github.io/
 # Copyright © 2012 Bernard Blackham <bernard@largestprime.net>
-# Copyright © 2013-2017 Stefano Maggiolo <s.maggiolo@gmail.com>
+# Copyright © 2013-2018 Stefano Maggiolo <s.maggiolo@gmail.com>
 # Copyright © 2014 Luca Versari <veluca93@gmail.com>
 # Copyright © 2016 Luca Wehrstedt <luca.wehrstedt@gmail.com>
 #
@@ -24,8 +24,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 
 import argparse
 import io
@@ -35,9 +35,13 @@ import re
 import sys
 
 from cms import utf8_decoder
-from cmstestsuite import CONFIG, combine_coverage, sh
+from cmstestsuite import CONFIG
+from cmstestsuite.coverage import clear_coverage, combine_coverage, \
+    send_coverage_to_codecov
+from cmstestsuite.profiling import \
+    PROFILER_KERNPROF, PROFILER_NONE, PROFILER_YAPPI
+from cmstestsuite.testrunner import TestRunner
 from cmstestsuite.Tests import ALL_TESTS
-from testrunner import TestRunner
 
 
 logger = logging.getLogger(__name__)
@@ -80,6 +84,8 @@ def load_test_list_from_file(filename):
             continue
 
         name, lang = bits
+        if lang == "None":
+            lang = None
 
         if name not in name_to_test_map:
             print("ERROR: %s:%d invalid test case: %s" %
@@ -171,10 +177,23 @@ def main():
     parser.add_argument(
         "-v", "--verbose", action="count", default=0,
         help="print debug information (use multiple times for more)")
+    parser.add_argument(
+        "--codecov", action="store_true",
+        help="send coverage results to Codecov (requires --coverage)")
+    g = parser.add_mutually_exclusive_group()
+    g.add_argument(
+        "--coverage", action="store_true",
+        help="compute line coverage information")
+    g.add_argument(
+        "--profiler", choices=[PROFILER_YAPPI, PROFILER_KERNPROF],
+        default=PROFILER_NONE, help="set profiler")
     args = parser.parse_args()
+    if args.codecov and not args.coverage:
+        parser.error("--codecov requires --coverage")
 
     CONFIG["VERBOSITY"] = args.verbose
-    CONFIG["COVERAGE"] = True
+    CONFIG["COVERAGE"] = args.coverage
+    CONFIG["PROFILER"] = args.profiler
 
     # Pre-process our command-line arguments to figure out which tests to run.
     regexes = [re.compile(s) for s in args.regex]
@@ -212,9 +231,7 @@ def main():
         logger.info(
             "Re-running %s failed tests from last run.", len(test_list))
 
-    # Clear out any old coverage data.
-    logging.info("Clearing old coverage data.")
-    sh([sys.executable, "-m", "coverage", "erase"])
+    clear_coverage()
 
     # Startup the test runner.
     runner = TestRunner(test_list, contest_id=args.contest, workers=4)
@@ -230,6 +247,9 @@ def main():
     runner.shutdown()
     runner.log_elapsed_time()
     combine_coverage()
+
+    if args.codecov:
+        send_coverage_to_codecov("functionaltests")
 
     logger.info("Executed: %s", tests)
     logger.info("Failed: %s", len(failures))

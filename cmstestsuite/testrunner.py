@@ -24,20 +24,18 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 
 import datetime
 import io
 import logging
 import os
-import random
 import subprocess
 
-from cmstestsuite import get_cms_config, CONFIG
-from cmstestsuite import add_contest, add_existing_user, add_existing_task, \
-    add_user, add_task, add_testcase, add_manager, \
-    get_tasks, get_users, initialize_aws
+from cms import TOKEN_MODE_FINITE
+from cmstestsuite import CONFIG
+from cmstestsuite.functionaltestframework import FunctionalTestFramework
 from cmstestsuite.Test import TestFailure
 from cmstestsuite.Tests import ALL_LANGUAGES
 from cmstestsuite.programstarter import ProgramStarter
@@ -48,23 +46,26 @@ logger = logging.getLogger(__name__)
 
 
 class TestRunner(object):
-    def __init__(self, test_list, contest_id=None, workers=1):
+    def __init__(self, test_list, contest_id=None, workers=1, cpu_limits=None):
         self.start_time = datetime.datetime.now()
         self.last_end_time = self.start_time
 
-        self.ps = ProgramStarter()
+        self.framework = FunctionalTestFramework()
+        self.load_cms_conf()
+
+        self.ps = ProgramStarter(cpu_limits)
 
         # Map from task name to (task id, task_module).
         self.task_id_map = {}
 
-        # Random bit to append to object's names to avoid collisions.
-        self.rand = random.randint(0, 999999999)
+        # String to append to objects' names to avoid collisions. Will be the
+        # first positive integer i for which admin_<i> is not already
+        # registered, and we will hope that if the admin name doesn't clash, no
+        # other name will.
+        self.suffix = None
 
         self.num_users = 0
         self.workers = workers
-
-        # Load config from cms.conf.
-        TestRunner.load_cms_conf()
 
         if CONFIG["TEST_DIR"] is not None:
             # Set up our expected environment.
@@ -72,7 +73,7 @@ class TestRunner(object):
             os.environ["PYTHONPATH"] = "%(TEST_DIR)s" % CONFIG
 
         self.start_generic_services()
-        initialize_aws(self.rand)
+        self.suffix = self.framework.initialize_aws()
 
         if contest_id is None:
             self.contest_id = self.create_contest()
@@ -89,8 +90,7 @@ class TestRunner(object):
         logging.info("Have %s submissions and %s user_tests in %s tests...",
                      self.n_submissions, self.n_user_tests, self.n_tests)
 
-    @staticmethod
-    def load_cms_conf():
+    def load_cms_conf(self):
         try:
             git_root = subprocess.check_output(
                 "git rev-parse --show-toplevel", shell=True,
@@ -101,7 +101,7 @@ class TestRunner(object):
         CONFIG["CONFIG_PATH"] = "%s/config/cms.conf" % CONFIG["TEST_DIR"]
         if CONFIG["TEST_DIR"] is None:
             CONFIG["CONFIG_PATH"] = "/usr/local/etc/cms.conf"
-        return get_cms_config()
+        return self.framework.get_cms_config()
 
     def log_elapsed_time(self):
         end_time = datetime.datetime.now()
@@ -135,16 +135,16 @@ class TestRunner(object):
         """
         start_time = datetime.datetime.utcnow()
         stop_time = start_time + datetime.timedelta(1, 0, 0)
-        self.contest_id = add_contest(
-            name="testcontest" + str(self.rand),
-            description="A test contest #%s." % self.rand,
+        self.contest_id = self.framework.add_contest(
+            name="testcontest_%s" % self.suffix,
+            description="A test contest #%s." % self.suffix,
             languages=list(ALL_LANGUAGES),
             allow_password_authentication="checked",
             start=start_time.strftime("%Y-%m-%d %H:%M:%S.%f"),
             stop=stop_time.strftime("%Y-%m-%d %H:%M:%S.%f"),
             timezone=get_system_timezone(),
             allow_user_tests="checked",
-            token_mode="finite",
+            token_mode=TOKEN_MODE_FINITE,
             token_max_number="100",
             token_min_interval="0",
             token_gen_initial="100",
@@ -168,10 +168,10 @@ class TestRunner(object):
                 return 'th'
             return {1: 'st', 2: 'nd', 3: 'rd'}.get(x % 10, 'th')
 
-        username = "testrabbit_%d_%d" % (self.rand, self.num_users)
+        username = "testrabbit_%s_%d" % (self.suffix, self.num_users)
 
         # Find a user that may already exist (from a previous contest).
-        users = get_users(self.contest_id)
+        users = self.framework.get_users(self.contest_id)
         user_create_args = {
             "username": username,
             "password": "kamikaze",
@@ -180,13 +180,14 @@ class TestRunner(object):
             "last_name": "Wabbit the %d%s" % (self.num_users,
                                               enumerify(self.num_users))
         }
+
         if username in users:
             self.user_id = users[username]['id']
-            add_existing_user(self.user_id, **user_create_args)
+            self.framework.add_existing_user(self.user_id, **user_create_args)
             logging.info("Using existing user with id %s.", self.user_id)
         else:
-            self.user_id = add_user(contest_id=str(self.contest_id),
-                                    **user_create_args)
+            self.user_id = self.framework.add_user(
+                contest_id=str(self.contest_id), **user_create_args)
             logging.info("Created user with id %s.", self.user_id)
         return self.user_id
 
@@ -198,7 +199,7 @@ class TestRunner(object):
         return (int): task id of the new (or existing) task.
 
         """
-        name = task_module.task_info['name'] + str(self.rand)
+        name = "%s_%s" % (task_module.task_info['name'], self.suffix)
 
         # Have we done this before? Pull it out of our cache if so.
         if name in self.task_id_map:
@@ -208,7 +209,7 @@ class TestRunner(object):
             return self.task_id_map[name][0]
 
         task_create_args = {
-            "token_mode": "finite",
+            "token_mode": TOKEN_MODE_FINITE,
             "token_max_number": "100",
             "token_min_interval": "0",
             "token_gen_initial": "100",
@@ -227,18 +228,19 @@ class TestRunner(object):
 
         # Find if the task already exists (the name make sure that if it
         # exists, it is already in out contest).
-        tasks = get_tasks()
+        tasks = self.framework.get_tasks()
         if name in tasks:
             # Then just use the existing one.
             task = tasks[name]
             task_id = task['id']
             self.task_id_map[name] = (task_id, task_module)
-            add_existing_task(task_id, contest_id=str(self.contest_id),
-                              **task_create_args)
+            self.framework.add_existing_task(
+                task_id, contest_id=str(self.contest_id), **task_create_args)
             return task_id
 
         # Otherwise, we need to add the task ourselves.
-        task_id = add_task(contest_id=str(self.contest_id), **task_create_args)
+        task_id = self.framework.add_task(
+            contest_id=str(self.contest_id), **task_create_args)
 
         # add any managers
         code_path = os.path.join(
@@ -247,7 +249,7 @@ class TestRunner(object):
         if hasattr(task_module, 'managers'):
             for manager in task_module.managers:
                 mpath = os.path.join(code_path, manager)
-                add_manager(task_id, mpath)
+                self.framework.add_manager(task_id, mpath)
 
         # add the task's test data.
         data_path = os.path.join(
@@ -257,7 +259,7 @@ class TestRunner(object):
                 in enumerate(task_module.test_cases):
             ipath = os.path.join(data_path, input_file)
             opath = os.path.join(data_path, output_file)
-            add_testcase(task_id, num, ipath, opath, public)
+            self.framework.add_testcase(task_id, num, ipath, opath, public)
 
         self.task_id_map[name] = (task_id, task_module)
 
@@ -288,9 +290,9 @@ class TestRunner(object):
             having a clearer view of the time each step takes.
 
         """
-        # Pre-install all tasks in the contest. After this, we restart
-        # ProxyService to ensure it reinitializes, picking up the new
-        # tasks and sending them to RWS.
+        # Pre-install all tasks in the contest. We start the other services
+        # after this to ensure they pick up the new tasks before receiving
+        # data for them.
         for test in self.test_list:
             self.create_or_get_task(test.task_module)
 
@@ -315,21 +317,20 @@ class TestRunner(object):
                          i + 1, self.n_submissions, test.name, lang)
             task_id = self.create_or_get_task(test.task_module)
             try:
-                test.submit(self.contest_id, task_id, self.user_id, lang)
+                test.submit(task_id, self.user_id, lang)
             except TestFailure as f:
-                logging.error("(FAILED (while submitting): %s)", f.message)
-                self.failures.append((test, lang, f.message))
+                logging.error("(FAILED (while submitting): %s)", f)
+                self.failures.append((test, lang, str(f)))
 
         for i, (test, lang) in enumerate(self._all_user_tests()):
             logging.info("Submitting user test  %s/%s: %s (%s)",
                          i + 1, self.n_user_tests, test.name, lang)
             task_id = self.create_or_get_task(test.task_module)
             try:
-                test.submit_user_test(
-                    self.contest_id, task_id, self.user_id, lang)
+                test.submit_user_test(task_id, self.user_id, lang)
             except TestFailure as f:
-                logging.error("(FAILED (while submitting): %s)", f.message)
-                self.failures.append((test, lang, f.message))
+                logging.error("(FAILED (while submitting): %s)", f)
+                self.failures.append((test, lang, str(f)))
 
         if not concurrent_submit_and_eval:
             self.ps.start("EvaluationService", contest=self.contest_id)
@@ -347,8 +348,8 @@ class TestRunner(object):
             try:
                 test.wait(self.contest_id, lang)
             except TestFailure as f:
-                logging.error("(FAILED (while evaluating): %s)", f.message)
-                self.failures.append((test, lang, f.message))
+                logging.error("(FAILED (while evaluating): %s)", f)
+                self.failures.append((test, lang, str(f)))
 
         for i, (test, lang) in enumerate(self._all_user_tests()):
             logging.info("Waiting for user test %s/%s: %s (%s)",
@@ -356,8 +357,7 @@ class TestRunner(object):
             try:
                 test.wait_user_test(self.contest_id, lang)
             except TestFailure as f:
-                logging.error("(FAILED (while evaluating user test): %s)",
-                              f.message)
-                self.failures.append((test, lang, f.message))
+                logging.error("(FAILED (while evaluating user test): %s)", f)
+                self.failures.append((test, lang, str(f)))
 
         return self.failures

@@ -21,8 +21,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 
 
 class InvalidKey(Exception):
@@ -65,11 +65,14 @@ class Entity(object):
         """
         pass
 
-    def consistent(self):
+    def consistent(self, stores):
         """Check if the entity is consistent.
 
         Verify that all references to other entities are correct (i.e.
         those entities actually exist).
+
+        stores ({str: Store}): a dict of Stores that can be used to
+            validate references to other entities.
 
         return (bool): the result of this check
 

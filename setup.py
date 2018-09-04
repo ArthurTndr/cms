@@ -3,7 +3,7 @@
 
 # Contest Management System - http://cms-dev.github.io/
 # Copyright © 2010-2013 Giovanni Mascellani <mascellani@poisson.phc.unipi.it>
-# Copyright © 2010-2016 Stefano Maggiolo <s.maggiolo@gmail.com>
+# Copyright © 2010-2018 Stefano Maggiolo <s.maggiolo@gmail.com>
 # Copyright © 2010-2012 Matteo Boscariol <boscarim@hotmail.com>
 # Copyright © 2013 Luca Wehrstedt <luca.wehrstedt@gmail.com>
 # Copyright © 2014 Artem Iglikov <artem.iglikov@gmail.com>
@@ -34,14 +34,15 @@ from __future__ import division
 from __future__ import print_function
 # setuptools doesn't seem to like this:
 # from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 
 import io
 import re
 import os
 
 from setuptools import setup, find_packages
+from setuptools.command.build_py import build_py
 
 
 PACKAGE_DATA = {
@@ -80,8 +81,15 @@ PACKAGE_DATA = {
         os.path.join("tasks", "batch_fileio_managed", "data", "*.*"),
         os.path.join("tasks", "communication", "code", "*"),
         os.path.join("tasks", "communication", "data", "*.*"),
-        os.path.join("tasks", "communication2", "code", "*"),
-        os.path.join("tasks", "communication2", "data", "*.*"),
+        os.path.join("tasks", "communication_many", "code", "*"),
+        os.path.join("tasks", "communication_many", "data", "*.*"),
+        os.path.join("tasks", "outputonly", "data", "*.*"),
+        os.path.join("tasks", "outputonly_comparator", "code", "*"),
+        os.path.join("tasks", "outputonly_comparator", "data", "*.*"),
+        os.path.join("tasks", "twosteps", "code", "*.*"),
+        os.path.join("tasks", "twosteps", "data", "*.*"),
+        os.path.join("tasks", "twosteps_comparator", "code", "*"),
+        os.path.join("tasks", "twosteps_comparator", "data", "*.*"),
     ],
 }
 
@@ -97,17 +105,28 @@ def find_version():
     raise RuntimeError("Unable to find version string.")
 
 
+# We piggyback the translation catalogs compilation onto build_py since
+# the po and mofiles will be part of the package data for cms.locale,
+# which is collected at this stage.
+class build_py_and_l10n(build_py):
+    def run(self):
+        self.run_command("compile_catalog")
+        # Can't use super here as in Py2 it isn't a new-style class.
+        build_py.run(self)
+
+
 setup(
     name="cms",
     version=find_version(),
     author="The CMS development team",
-    author_email="contestms@freelists.org",
+    author_email="contestms@googlegroups.com",
     url="https://github.com/cms-dev/cms",
     download_url="https://github.com/cms-dev/cms/archive/master.tar.gz",
     description="A contest management system and grader "
                 "for IOI-like programming competitions",
     packages=find_packages(),
     package_data=PACKAGE_DATA,
+    cmdclass={"build_py": build_py_and_l10n},
     scripts=["scripts/cmsLogService",
              "scripts/cmsScoringService",
              "scripts/cmsEvaluationService",
@@ -151,9 +170,32 @@ setup(
             "cmsRemoveUser=cmscontrib.RemoveUser:main",
             "cmsSpoolExporter=cmscontrib.SpoolExporter:main",
             "cmsMake=cmstaskenv.cmsMake:main",
-            "cmsYamlImporter=cmscompat.YamlImporter:main",
-            "cmsYamlReimporter=cmscompat.YamlReimporter:main",
-        ]
+        ],
+        "cms.grading.tasktypes": [
+            "Batch=cms.grading.tasktypes.Batch:Batch",
+            "Communication=cms.grading.tasktypes.Communication:Communication",
+            "OutputOnly=cms.grading.tasktypes.OutputOnly:OutputOnly",
+            "TwoSteps=cms.grading.tasktypes.TwoSteps:TwoSteps",
+        ],
+        "cms.grading.scoretypes": [
+            "Sum=cms.grading.scoretypes.Sum:Sum",
+            "GroupMin=cms.grading.scoretypes.GroupMin:GroupMin",
+            "GroupMul=cms.grading.scoretypes.GroupMul:GroupMul",
+            "GroupThreshold=cms.grading.scoretypes.GroupThreshold:GroupThreshold",
+        ],
+        "cms.grading.languages": [
+            "C++11 / g++=cms.grading.languages.cpp11_gpp:Cpp11Gpp",
+            "C11 / gcc=cms.grading.languages.c11_gcc:C11Gcc",
+            "C# / Mono=cms.grading.languages.csharp_mono:CSharpMono",
+            "Haskell / ghc=cms.grading.languages.haskell_ghc:HaskellGhc",
+            "Java 1.4 / gcj=cms.grading.languages.java14_gcj:Java14Gcj",
+            "Java / JDK=cms.grading.languages.java_jdk:JavaJDK",
+            "Pascal / fpc=cms.grading.languages.pascal_fpc:PascalFpc",
+            "PHP=cms.grading.languages.php:Php",
+            "Python 2 / CPython=cms.grading.languages.python2_cpython:Python2CPython",
+            "Python 3 / CPython=cms.grading.languages.python3_cpython:Python3CPython",
+            "Rust=cms.grading.languages.rust:Rust",
+        ],
     },
     keywords="ioi programming contest grader management system",
     license="Affero General Public License v3",

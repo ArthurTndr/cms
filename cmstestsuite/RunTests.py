@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Contest Management System - http://cms-dev.github.io/
-# Copyright © 2013 Stefano Maggiolo <s.maggiolo@gmail.com>
+# Copyright © 2013-2018 Stefano Maggiolo <s.maggiolo@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -21,13 +21,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 
+import io
 import os
 import sys
 
-from cmstestsuite import FrameworkException, sh
+from cmstestsuite import TestException, sh
 
 
 UNITTESTS = "unittests"
@@ -58,10 +59,11 @@ def main():
             sh(["./cmstestsuite/RunUnitTests.py"] + sys.argv[1:])
         if test_suite == FUNCTIONALTESTS or len(test_suite) == 0:
             sh(["./cmstestsuite/RunFunctionalTests.py"] + sys.argv[1:])
-    except FrameworkException:
+    except TestException:
         if os.path.exists("./log/cms/last.log"):
             print("\n\n===== START OF LOG DUMP =====\n\n")
-            print(open("./log/cms/last.log").read())
+            with io.open("./log/cms/last.log", "rt", encoding="utf-8") as f:
+                print(f.read())
             print("\n\n===== END OF LOG DUMP =====\n\n")
         return 1
     return 0

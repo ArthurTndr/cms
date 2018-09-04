@@ -57,8 +57,6 @@ These files are a pretty good starting point if you want to try CMS. There are s
 
 * if you are running low on disk space, you may want to make sure ``keep_sandbox`` is set to ``false``;
 
-* if you want to run CMS without installing it, you need to change ``process_cmdline`` to reflect that.
-
 If you are organizing a real contest, you must also change ``secret_key`` to a random key (the admin interface will suggest one if you visit it when ``secret_key`` is the default). You will also need to think about how to distribute your services and change ``core_services`` accordingly. Finally, you should change the ranking section of :file:`cms.conf`, and :file:`cms.ranking.conf`, using non-trivial username and password.
 
 .. warning::
@@ -112,6 +110,8 @@ Recommended setup
 Of course, the number of servers one needs to run a contest depends on many factors (number of participants, length of the contest, economical issues, more technical matters...). We recommend that, for fairness, each Worker runs an a dedicated machine (i.e., without other CMS services beyond ResourceService).
 
 As for the distribution of services, usually there is one ResourceService for each machine, one instance for each of LogService, ScoringService, Checker, EvaluationService, AdminWebServer, and one or more instances of ContestWebServer and Worker. Again, if there are more than one Worker, we recommend to run them on different machines.
+
+The developers of isolate (the sandbox CMS uses) provide a script, :file:`isolate-check-environment` that verifies your system is able to produce evaluations as fair and reproducible as possible. We recommend to run it and follow its suggestions on all machines where a Worker is running. You can download it `here <https://github.com/ioi/isolate/blob/master/isolate-check-environment>`_.
 
 We suggest using CMS over Ubuntu. Yet, CMS can be successfully run on different Linux distributions. Non-Linux operating systems are not supported.
 

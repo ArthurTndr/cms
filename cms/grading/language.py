@@ -23,8 +23,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
+from six import with_metaclass
 
 import logging
 import os
@@ -34,10 +35,8 @@ from abc import ABCMeta, abstractmethod
 logger = logging.getLogger(__name__)
 
 
-class Language(object):
+class Language(with_metaclass(ABCMeta, object)):
     """A supported programming language"""
-
-    __metaclass__ = ABCMeta
 
     @property
     @abstractmethod
@@ -150,6 +149,19 @@ class Language(object):
 
         """
         pass
+
+    # It's sometimes handy to use Language objects in sets or as dict
+    # keys. Since they have no state (they are just collections of
+    # constants and static methods) and are designed to be used as
+    # singletons, it's very easy to make them hashable.
+
+    @classmethod
+    def __eq__(cls, other):
+        return type(other) is cls
+
+    @classmethod
+    def __hash__(cls):
+        return hash(cls)
 
 
 class CompiledLanguage(Language):

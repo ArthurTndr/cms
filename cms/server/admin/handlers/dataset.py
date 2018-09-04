@@ -3,7 +3,7 @@
 
 # Contest Management System - http://cms-dev.github.io/
 # Copyright © 2010-2013 Giovanni Mascellani <mascellani@poisson.phc.unipi.it>
-# Copyright © 2010-2015 Stefano Maggiolo <s.maggiolo@gmail.com>
+# Copyright © 2010-2018 Stefano Maggiolo <s.maggiolo@gmail.com>
 # Copyright © 2010-2012 Matteo Boscariol <boscarim@hotmail.com>
 # Copyright © 2012-2018 Luca Wehrstedt <luca.wehrstedt@gmail.com>
 # Copyright © 2014 Artem Iglikov <artem.iglikov@gmail.com>
@@ -32,28 +32,24 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 from six import itervalues
 
+import io
 import logging
-import os
 import re
-import shutil
-import tempfile
 import zipfile
-from io import StringIO
 
 import tornado.web
 
-from cms import config
 from cms.db import Dataset, Manager, Message, Participation, \
     Session, Submission, Task, Testcase
-from cms.grading import compute_changes_for_dataset
+from cms.grading.scoring import compute_changes_for_dataset
 from cmscommon.datetime import make_datetime
 from cmscommon.importers import import_testcases_from_zipfile
 
-from .base import BaseHandler, FileHandler, require_permission
+from .base import BaseHandler, require_permission
 
 
 logger = logging.getLogger(__name__)
@@ -68,6 +64,7 @@ class DatasetSubmissionsHandler(BaseHandler):
     def get(self, dataset_id):
         dataset = self.safe_get_item(Dataset, dataset_id)
         task = dataset.task
+        self.contest = task.contest
 
         submission_query = self.sql_session.query(Submission)\
             .filter(Submission.task == task)
@@ -98,6 +95,7 @@ class CloneDatasetHandler(BaseHandler):
     def get(self, dataset_id_to_copy):
         dataset = self.safe_get_item(Dataset, dataset_id_to_copy)
         task = self.safe_get_item(Task, dataset.task_id)
+        self.contest = task.contest
 
         try:
             original_dataset = \
@@ -188,6 +186,7 @@ class RenameDatasetHandler(BaseHandler):
     def get(self, dataset_id):
         dataset = self.safe_get_item(Dataset, dataset_id)
         task = dataset.task
+        self.contest = task.contest
 
         self.r_params = self.render_params()
         self.r_params["task"] = task
@@ -229,6 +228,7 @@ class DeleteDatasetHandler(BaseHandler):
     def get(self, dataset_id):
         dataset = self.safe_get_item(Dataset, dataset_id)
         task = dataset.task
+        self.contest = task.contest
 
         self.r_params = self.render_params()
         self.r_params["task"] = task
@@ -256,6 +256,7 @@ class ActivateDatasetHandler(BaseHandler):
     def get(self, dataset_id):
         dataset = self.safe_get_item(Dataset, dataset_id)
         task = dataset.task
+        self.contest = task.contest
 
         changes = compute_changes_for_dataset(task.active_dataset, dataset)
         notify_participations = set()
@@ -351,6 +352,7 @@ class AddManagerHandler(BaseHandler):
     def get(self, dataset_id):
         dataset = self.safe_get_item(Dataset, dataset_id)
         task = dataset.task
+        self.contest = task.contest
 
         self.r_params = self.render_params()
         self.r_params["task"] = task
@@ -422,6 +424,7 @@ class AddTestcaseHandler(BaseHandler):
     def get(self, dataset_id):
         dataset = self.safe_get_item(Dataset, dataset_id)
         task = dataset.task
+        self.contest = task.contest
 
         self.r_params = self.render_params()
         self.r_params["task"] = task
@@ -493,6 +496,7 @@ class AddTestcasesHandler(BaseHandler):
     def get(self, dataset_id):
         dataset = self.safe_get_item(Dataset, dataset_id)
         task = dataset.task
+        self.contest = task.contest
 
         self.r_params = self.render_params()
         self.r_params["task"] = task
@@ -529,7 +533,7 @@ class AddTestcasesHandler(BaseHandler):
         output_re = re.compile(re.escape(output_template).replace("\\*",
                                "(.*)") + "$")
 
-        fp = StringIO(archive["body"])
+        fp = io.BytesIO(archive["body"])
         try:
             successful_subject, successful_text = \
                 import_testcases_from_zipfile(
@@ -571,7 +575,7 @@ class DeleteTestcaseHandler(BaseHandler):
         self.write("./%d" % task_id)
 
 
-class DownloadTestcasesHandler(FileHandler):
+class DownloadTestcasesHandler(BaseHandler):
     """Download all testcases in a zip file.
 
     """
@@ -579,6 +583,7 @@ class DownloadTestcasesHandler(FileHandler):
     def get(self, dataset_id):
         dataset = self.safe_get_item(Dataset, dataset_id)
         task = dataset.task
+        self.contest = task.contest
 
         self.r_params = self.render_params()
         self.r_params["task"] = task
@@ -611,22 +616,24 @@ class DownloadTestcasesHandler(FileHandler):
         input_template = input_template.strip().replace("*", "%s")
         output_template = output_template.strip().replace("*", "%s")
 
-        # Create a temp dir to contain the content of the zip file.
-        tempdir = tempfile.mkdtemp(dir=config.temp_dir)
-        zip_path = os.path.join(tempdir, "testcases.zip")
-        with zipfile.ZipFile(zip_path, "w") as zip_file:
+        # FIXME When Tornado will stop having the WSGI adapter buffer
+        # the whole response, we could use a tempfile.TemporaryFile so
+        # to avoid having the whole ZIP file in memory at once.
+        temp_file = io.BytesIO()
+        with zipfile.ZipFile(temp_file, "w") as zip_file:
             for testcase in itervalues(dataset.testcases):
                 # Get input, output file path
-                input_path = self.service.file_cacher.\
-                    get_file(testcase.input).name
-                output_path = self.service.file_cacher.\
-                    get_file(testcase.output).name
+                with self.service.file_cacher.get_file(testcase.input) as f:
+                    input_path = f.name
+                with self.service.file_cacher.get_file(testcase.output) as f:
+                    output_path = f.name
                 zip_file.write(
                     input_path, input_template % testcase.codename)
                 zip_file.write(
                     output_path, output_template % testcase.codename)
-            zip_file.close()
 
-        self.fetch_from_filesystem(zip_path, "application/zip", zip_filename)
+        self.set_header("Content-Type", "application/zip")
+        self.set_header("Content-Disposition",
+                        "attachment; filename=\"%s\"" % zip_filename)
 
-        shutil.rmtree(tempdir)
+        self.write(temp_file.getvalue())

@@ -19,7 +19,7 @@ msgstr ""
 msgid "Compilation succeeded"
 msgstr "编译成功"
 
-msgid "Your submission successfully compiled to an excutable."
+msgid "Your submission successfully compiled to an executable."
 msgstr "您的提交"
 
 msgid "Compilation failed"
@@ -40,7 +40,7 @@ msgstr "程序编译超时。比如说，这可能是因为过度使用C++模板
 msgid ""
 "Compilation killed with signal %s (could be triggered by violating memory "
 "limits)"
-msgstr "编译程序因内存违规存取而强制终止 (信号 %d)"
+msgstr "编译程序因内存违规存取而强制终止 (信号 %s)"
 
 msgid ""
 "Your submission was killed with the specified signal. Among other things, "
@@ -103,23 +103,6 @@ msgid ""
 "before the allocation that caused the signal."
 msgstr "程序因为制定信号而被强制终止。这可能是因为内存溢出。注意如果这是原因的话，程序报告中的内存使用信息是信号被发出前的信息。"
 
-#, python-format
-msgid "Execution killed because of forbidden syscall %s"
-msgstr "程序因违规存取系统函数 %s 而被强制终止"
-
-msgid ""
-"Your submission was killed because it tried to use the forbidden syscall "
-"specified in the message."
-msgstr "程序因违规系统调用而被强制终止"
-
-msgid "Execution killed because of forbidden file access"
-msgstr "程序因违规存取文件系统而被强制终止"
-
-msgid ""
-"Your submission was killed because it tried to read or write a forbidden "
-"file."
-msgstr "程序因违规读写文件而被强制终止"
-
 msgid "Execution failed because the return code was nonzero"
 msgstr "执行失败: 程序返回值非零"
 
@@ -131,8 +114,8 @@ msgid "N/A"
 msgstr "(空)"
 
 #, python-format
-msgid "Subtask %d"
-msgstr "子问题 %d"
+msgid "Subtask %(index)s"
+msgstr "子问题 %(index)s"
 
 msgid "Outcome"
 msgstr "评测结果"
@@ -167,49 +150,8 @@ msgstr "略过编译程序"
 msgid "File not submitted"
 msgstr "文件未送出"
 
-msgid "%Y-%m-%d"
-msgstr "%Y-%m-%d"
-
-msgid "%H:%M:%S"
-msgstr "%H:%M:%S"
-
-msgid "%Y-%m-%d %H:%M:%S"
-msgstr "%Y-%m-%d %H:%M:%S"
-
 msgid "loading..."
 msgstr "载入中..."
-
-#, python-format
-msgid "%d second"
-msgid_plural "%d seconds"
-msgstr[0] "%d 秒"
-msgstr[1] "%d 秒"
-
-#, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d 分钟"
-msgstr[1] "%d 分钟"
-
-#, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d 小时"
-msgstr[1] "%d 小时"
-
-#, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d 天"
-msgstr[1] "%d 天"
-
-#, python-format
-msgid "%s and %s"
-msgstr "%s 与 %s"
-
-#, python-format
-msgid "more than %s"
-msgstr "超过 %s"
 
 msgid "contest-token"
 msgstr "竞赛-Token"
@@ -505,12 +447,8 @@ msgid "Executed"
 msgstr "已评测"
 
 #, python-format
-msgid "{seconds:0.3f} s"
-msgstr "{seconds:0.3f} 秒"
-
-#, python-format
-msgid "Automatic (%s)"
-msgstr "自动检测 (%s)"
+msgid "Automatic (%(lang)s)"
+msgstr "自动检测 (%(lang)s)"
 
 msgid "Logout"
 msgstr "登出"
@@ -649,8 +587,8 @@ msgid "Submission details for evaluation"
 msgstr "程序评估细节"
 
 #, python-format
-msgid "Error %d"
-msgstr "错误 %d"
+msgid "Error %(status_code)s"
+msgstr "错误 %(status_code)s"
 
 msgid "An error occured while the server was handling your request."
 msgstr "竞赛系统服务器发生错误."
@@ -800,18 +738,6 @@ msgstr "传送文件"
 msgid "Tokens"
 msgstr "Token"
 
-#, python-format
-msgid "{seconds:g} second"
-msgstr "{seconds:g} 秒"
-
-#, python-format
-msgid "{seconds:g} seconds"
-msgstr "{seconds:g} 秒"
-
-#, python-format
-msgid "%(mb)d MiB"
-msgstr "%(mb)d MiB"
-
 msgid "Yes"
 msgstr "是"
 
@@ -823,15 +749,15 @@ msgstr "打印"
 
 #, python-format
 msgid ""
-"You can print %(remaining_jobs)d more text or PDF files of up to "
-"%(max_pages)d pages each."
-msgstr "您可以再打印%(remaining_jobs)d个文本文件或者PDF，每个文件最多%(max_pages)d页."
+"You can print %(remaining_jobs)s more text or PDF files of up to "
+"%(max_pages)s pages each."
+msgstr "您可以再打印%(remaining_jobs)s个文本文件或者PDF，每个文件最多%(max_pages)s页."
 
 #, python-format
 msgid ""
-"You can print %(remaining_jobs)d more text files of up to %(max_pages)d "
+"You can print %(remaining_jobs)s more text files of up to %(max_pages)s "
 "pages each."
-msgstr "您可以打印%(remaining_jobs)d个文本文件，每个文件最多%(max_pages)d页."
+msgstr "您可以打印%(remaining_jobs)s个文本文件，每个文件最多%(max_pages)s页."
 
 msgid "File (text or PDF)"
 msgstr "文件（文字或PDF）"
@@ -928,20 +854,20 @@ msgid "Some suggested translations follow."
 msgstr "推荐翻译版本如下."
 
 #, python-format
-msgid "Statement in <b>%s</b>"
-msgstr "题目描述 in <b>%s</b>"
+msgid "Statement in <b>%(lang)s</b>"
+msgstr "题目描述 in <b>%(lang)s</b>"
 
 #, python-format
-msgid "Statement in %s"
-msgstr "题目描述 in %s"
+msgid "Statement in %(lang)s"
+msgstr "题目描述 in %(lang)s"
 
 #, python-format
-msgid "<b>%s</b>"
-msgstr "<b>%s</b>"
+msgid "<b>%(lang)s</b>"
+msgstr "<b>%(lang)s</b>"
 
 #, python-format
-msgid "%s"
-msgstr "%s"
+msgid "%(lang)s"
+msgstr "%(lang)s"
 
 msgid "Some details"
 msgstr "详细信息"
@@ -973,7 +899,7 @@ msgstr "提交解答"
 
 #, python-format
 msgid "You can submit %(submissions_left)s more solution(s)."
-msgstr "您可以再上传%(submissions_left)个解答"
+msgstr "您可以再上传%(submissions_left)s个解答"
 
 msgid "submission.zip"
 msgstr "submission.zip"

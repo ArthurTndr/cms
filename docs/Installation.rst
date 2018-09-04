@@ -16,15 +16,9 @@ These are our requirements (in particular we highlight those that are not usuall
 
 * `GNU compiler collection <https://gcc.gnu.org/>`_ (in particular the C compiler ``gcc``);
 
-* `gettext <http://www.gnu.org/software/gettext/>`_ >= 0.18;
-
 * `Python <http://www.python.org/>`_ 2.7 or 3.6;
 
 * `libcg <http://libcg.sourceforge.net/>`_;
-
-* `iso-codes <http://pkg-isocodes.alioth.debian.org/>`_;
-
-* `shared-mime-info <http://freedesktop.org/wiki/Software/shared-mime-info>`_;
 
 * `TeX Live <https://www.tug.org/texlive/>`_ (only for printing);
 
@@ -55,23 +49,25 @@ All dependencies can be installed automatically on most Linux distributions.
 Ubuntu
 ------
 
-On Ubuntu 16.04, one will need to run the following script to satisfy all dependencies:
+On Ubuntu 18.04, one will need to run the following script to satisfy all dependencies:
 
 .. sourcecode:: bash
 
     # Feel free to change OpenJDK packages with your preferred JDK.
-    sudo apt-get install build-essential openjdk-8-jre openjdk-8-jdk \
-        fp-compiler fp-units-base fp-units-fcl fp-units-misc fp-units-math fp-units-rtl \
-        postgresql postgresql-client gettext python3.6 \
-        iso-codes shared-mime-info stl-manual cgroup-lite libcap-dev
+    sudo apt-get install build-essential openjdk-8-jdk-headless fp-compiler \
+        postgresql postgresql-client python3.6 cppreference-doc-en-html \
+        cgroup-lite libcap-dev
 
-    # Only if you are going to use pip/virtualenv to install python dependencies
+    # Only if you are going to use pip/venv to install python dependencies
     sudo apt-get install python3.6-dev libpq-dev libcups2-dev libyaml-dev \
-         libffi-dev python-pip
+        libffi-dev python3-pip
 
     # Optional
-    sudo apt-get install nginx-full python2.7 php7.0-cli php7.0-fpm phppgadmin \
-         texlive-latex-base a2ps gcj-jdk haskell-platform rustc mono-mcs
+    sudo apt-get install nginx-full python2.7 php7.2-cli php7.2-fpm \
+        phppgadmin texlive-latex-base a2ps gcj-jdk haskell-platform rustc \
+        mono-mcs
+
+The above commands provide a very essential Pascal environment. Consider installing the following packages for additional units: `fp-units-base`, `fp-units-fcl`, `fp-units-misc`, `fp-units-math` and `fp-units-rtl`.
 
 Arch Linux
 ----------
@@ -80,20 +76,19 @@ On Arch Linux, unofficial AUR packages can be found: `cms <http://aur.archlinux.
 
 .. sourcecode:: bash
 
-    sudo pacman -S base-devel jre8-openjdk jdk8-openjdk fpc \
-         postgresql postgresql-client python \
-         iso-codes shared-mime-info libcap
+    sudo pacman -S base-devel jdk8-openjdk fpc postgresql postgresql-client \
+        python libcap
 
     # Install the following from AUR.
     # https://aur.archlinux.org/packages/libcgroup/
-    # https://aur.archlinux.org/packages/sgi-stl-doc/
+    # https://aur.archlinux.org/packages/cppreference/
 
-    # Only if you are going to use pip/virtualenv to install python dependencies
+    # Only if you are going to use pip/venv to install python dependencies
     sudo pacman -S --needed postgresql-libs libcups libyaml python-pip
 
     # Optional
     sudo pacman -S --needed nginx python2 php php-fpm phppgadmin texlive-core \
-         a2ps ghc rust mono
+        a2ps ghc rust mono
 
 Preparation steps
 =================
@@ -210,9 +205,9 @@ To install CMS and its Python dependencies on Ubuntu, you can issue:
 
     sudo apt-get install python3-setuptools python3-tornado python3-psycopg2 \
          python3-sqlalchemy python3-psutil python3-netifaces python3-crypto \
-         python3-tz python3-six python3-bs4 python3-coverage python3-mock \
-         python3-requests python3-werkzeug python3-gevent python3-bcrypt \
-         python3-chardet patool python3-ipaddress
+         python3-six python3-bs4 python3-coverage python3-mock python3-requests \
+         python3-werkzeug python3-gevent python3-bcrypt python3-chardet patool \
+         python3-babel python3-xdg python3-future python3-jinja2
 
     # Optional.
     # sudo apt-get install python3-yaml python3-sphinx python3-cups python3-pypdf2
@@ -232,9 +227,9 @@ To install CMS python dependencies on Arch Linux (again: assuming you did not us
 
     sudo pacman -S --needed python-setuptools python-tornado python-psycopg2 \
          python-sqlalchemy python-psutil python-netifaces python-crypto \
-         python-pytz python-six python-beautifulsoup4 python-coverage \
-         python-mock python-requests python-werkzeug python-gevent \
-         python-bcrypt python-chardet python-ipaddress
+         python-six python-beautifulsoup4 python-coverage python-mock \
+         python-requests python-werkzeug python-gevent python-bcrypt \
+         python-chardet python-babel python-xdg python-future python-jinja
 
     # Install the following from AUR.
     # https://aur.archlinux.org/packages/patool/

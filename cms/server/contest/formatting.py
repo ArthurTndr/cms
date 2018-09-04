@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 # Contest Management System - http://cms-dev.github.io/
@@ -27,189 +27,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
-from future.builtins.disabled import *
-from future.builtins import *
+from future.builtins.disabled import *  # noqa
+from future.builtins import *  # noqa
 
-from future.moves.urllib.parse import quote
-
-import tornado.locale
-
-from cmscommon.datetime import make_datetime, utc
-from cms.locale import locale_format
+from cms import TOKEN_MODE_DISABLED, TOKEN_MODE_FINITE, TOKEN_MODE_INFINITE
+from cms.locale import DEFAULT_TRANSLATION
 
 
-# Dummy function to mark strings for translation
-def N_(*unused_args, **unused_kwargs):
-    pass
-
-
-# Some strings in templates that for some reason don't get included in cms.pot.
-N_("loading...")
-N_("unknown")
-
-# Other messages used in this file.
-N_("%d second", "%d seconds", 0)
-N_("%d minute", "%d minutes", 0)
-N_("%d hour", "%d hours", 0)
-N_("%d day", "%d days", 0)
-
-
-def format_datetime(dt, timezone, locale=None):
-    """Return the date and time of dt formatted as per locale.
-
-    dt (datetime): a datetime object.
-    timezone (tzinfo): the timezone the output should be in.
-
-    return (str): the date and time of dt, formatted using the given
-        locale.
-
-    """
-    if locale is None:
-        locale = tornado.locale.get()
-
-    _ = locale.translate
-
-    # convert dt from UTC to local time
-    dt = dt.replace(tzinfo=utc).astimezone(timezone)
-
-    return dt.strftime(_("%Y-%m-%d %H:%M:%S"))
-
-
-def format_time(dt, timezone, locale=None):
-    """Return the time of dt formatted according to the given locale.
-
-    dt (datetime): a datetime object.
-    timezone (tzinfo): the timezone the output should be in.
-
-    return (str): the time of dt, formatted using the given locale.
-
-    """
-    if locale is None:
-        locale = tornado.locale.get()
-
-    _ = locale.translate
-
-    # convert dt from UTC to local time
-    dt = dt.replace(tzinfo=utc).astimezone(timezone)
-
-    return dt.strftime(_("%H:%M:%S"))
-
-
-def format_datetime_smart(dt, timezone, locale=None):
-    """Return dt formatted as '[date] time'.
-
-    Date is present in the output if it is not today.
-
-    dt (datetime): a datetime object.
-    timezone (tzinfo): the timezone the output should be in.
-
-    return (str): the [date and] time of dt, formatted using the given
-        locale.
-
-    """
-    if locale is None:
-        locale = tornado.locale.get()
-
-    _ = locale.translate
-
-    # convert dt and 'now' from UTC to local time
-    dt = dt.replace(tzinfo=utc).astimezone(timezone)
-    now = make_datetime().replace(tzinfo=utc).astimezone(timezone)
-
-    if dt.date() == now.date():
-        return dt.strftime(_("%H:%M:%S"))
-    else:
-        return dt.strftime(_("%Y-%m-%d %H:%M:%S"))
-
-
-def format_amount_of_time(seconds, precision=2, locale=None):
-    """Return the number of seconds formatted 'X days, Y hours, ...'
-
-    The time units that will be used are days, hours, minutes, seconds.
-    Only the first "precision" units will be output. If they're not
-    enough, a "more than ..." will be prefixed (non-positive precision
-    means infinite).
-
-    seconds (int): the length of the amount of time in seconds.
-    precision (int): see above
-    locale (Locale|None): the locale to be used, or None for the
-        default.
-
-    return (string): seconds formatted as above.
-
-    """
-    seconds = abs(int(seconds))
-
-    if locale is None:
-        locale = tornado.locale.get()
-
-    _ = locale.translate
-
-    if seconds == 0:
-        return _("%d second", "%d seconds", 0) % 0
-
-    units = [(("%d day", "%d days"), 60 * 60 * 24),
-             (("%d hour", "%d hours"), 60 * 60),
-             (("%d minute", "%d minutes"), 60),
-             (("%d second", "%d seconds"), 1)]
-
-    ret = list()
-    counter = 0
-
-    for name, length in units:
-        tmp = seconds // length
-        seconds %= length
-        if tmp == 0:
-            continue
-        else:
-            ret.append(_(name[0], name[1], tmp) % tmp)
-        counter += 1
-        if counter == precision:
-            break
-
-    if len(ret) == 1:
-        ret = ret[0]
-    else:
-        ret = _("%s and %s") % (", ".join(ret[:-1]), ret[-1])
-
-    if seconds > 0:
-        ret = _("more than %s") % ret
-
-    return ret
-
-
-UNITS = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
-DIMS = list(1024 ** x for x in range(9))
-
-
-def format_size(n, _=lambda s: s):
-    """Format the given number of bytes.
-
-    Return a size, given as a number of bytes, properly formatted
-    using the most appropriate size unit. Always use three
-    significant digits.
-
-    """
-    if n == 0:
-        return '0 B'
-
-    # Use the last unit that's smaller than n
-    try:
-        unit_index = next(i for i, x in enumerate(DIMS) if n < x) - 1
-    except StopIteration:
-        unit_index = -1
-    n = n / DIMS[unit_index]
-
-    if n < 10:
-        d = 2
-    elif n < 100:
-        d = 1
-    else:
-        d = 0
-    return locale_format(_, "{0:g} {1}", round(n, d), UNITS[unit_index])
-
-
-def format_token_rules(tokens, t_type=None, locale=None):
+def format_token_rules(tokens, t_type=None, translation=DEFAULT_TRANSLATION):
     """Return a human-readable string describing the given token rules
 
     tokens (dict): all the token rules (as seen in Task or Contest),
@@ -217,16 +42,13 @@ def format_token_rules(tokens, t_type=None, locale=None):
     t_type (string|None): the type of tokens the string should refer to
         (can be "contest" to mean contest-tokens, "task" to mean
         task-tokens, any other value to mean normal tokens).
-    locale (Locale|NullTranslation|None): the locale to be used (None
-        for the default).
+    translation (Translation): the translation to use.
 
     return (unicode): localized string describing the rules.
 
     """
-    if locale is None:
-        locale = tornado.locale.get()
-
-    _ = locale.translate
+    _ = translation.gettext
+    n_ = translation.ngettext
 
     if t_type == "contest":
         tokens["type_s"] = _("contest-token")
@@ -243,69 +65,71 @@ def format_token_rules(tokens, t_type=None, locale=None):
 
     result = ""
 
-    if tokens["mode"] == "disabled":
+    if tokens["mode"] == TOKEN_MODE_DISABLED:
         # This message will only be shown on tasks in case of a mixed
         # modes scenario.
         result += \
             _("You don't have %(type_pl)s available for this task.") % tokens
-    elif tokens["mode"] == "infinite":
+    elif tokens["mode"] == TOKEN_MODE_INFINITE:
         # This message will only be shown on tasks in case of a mixed
         # modes scenario.
         result += \
             _("You have an infinite number of %(type_pl)s "
               "for this task.") % tokens
-    else:
+    elif tokens["mode"] == TOKEN_MODE_FINITE:
         if tokens['gen_initial'] == 0:
             result += _("You start with no %(type_pl)s.") % tokens
         else:
-            result += _("You start with one %(type_s)s.",
-                        "You start with %(gen_initial)d %(type_pl)s.",
-                        tokens['gen_initial'] == 1) % tokens
+            result += n_("You start with one %(type_s)s.",
+                         "You start with %(gen_initial)d %(type_pl)s.",
+                         tokens['gen_initial'] == 1) % tokens
 
         result += " "
 
         if tokens['gen_number'] > 0:
-            result += _("Every minute ",
-                        "Every %(gen_interval)g minutes ",
-                        tokens['gen_interval']) % tokens
+            result += n_("Every minute ",
+                         "Every %(gen_interval)g minutes ",
+                         tokens['gen_interval']) % tokens
             if tokens['gen_max'] is not None:
-                result += _("you get another %(type_s)s, ",
-                            "you get %(gen_number)d other %(type_pl)s, ",
-                            tokens['gen_number']) % tokens
-                result += _("up to a maximum of one %(type_s)s.",
-                            "up to a maximum of %(gen_max)d %(type_pl)s.",
-                            tokens['gen_max']) % tokens
+                result += n_("you get another %(type_s)s, ",
+                             "you get %(gen_number)d other %(type_pl)s, ",
+                             tokens['gen_number']) % tokens
+                result += n_("up to a maximum of one %(type_s)s.",
+                             "up to a maximum of %(gen_max)d %(type_pl)s.",
+                             tokens['gen_max']) % tokens
             else:
-                result += _("you get another %(type_s)s.",
-                            "you get %(gen_number)d other %(type_pl)s.",
-                            tokens['gen_number']) % tokens
+                result += n_("you get another %(type_s)s.",
+                             "you get %(gen_number)d other %(type_pl)s.",
+                             tokens['gen_number']) % tokens
         else:
             result += _("You don't get other %(type_pl)s.") % tokens
 
         result += " "
 
         if tokens['min_interval'] > 0 and tokens['max_number'] is not None:
-            result += _("You can use a %(type_s)s every second ",
-                        "You can use a %(type_s)s every %(min_interval)g "
-                        "seconds ",
-                        tokens['min_interval']) % tokens
-            result += _("and no more than one %(type_s)s in total.",
-                        "and no more than %(max_number)d %(type_pl)s in "
-                        "total.",
-                        tokens['max_number']) % tokens
+            result += n_("You can use a %(type_s)s every second ",
+                         "You can use a %(type_s)s every %(min_interval)g "
+                         "seconds ",
+                         tokens['min_interval']) % tokens
+            result += n_("and no more than one %(type_s)s in total.",
+                         "and no more than %(max_number)d %(type_pl)s in "
+                         "total.",
+                         tokens['max_number']) % tokens
         elif tokens['min_interval'] > 0:
-            result += _("You can use a %(type_s)s every second.",
-                        "You can use a %(type_s)s every %(min_interval)g "
-                        "seconds.",
-                        tokens['min_interval']) % tokens
+            result += n_("You can use a %(type_s)s every second.",
+                         "You can use a %(type_s)s every %(min_interval)g "
+                         "seconds.",
+                         tokens['min_interval']) % tokens
         elif tokens['max_number'] is not None:
-            result += _("You can use no more than one %(type_s)s in total.",
-                        "You can use no more than %(max_number)d %(type_pl)s "
-                        "in total.",
-                        tokens['max_number']) % tokens
+            result += n_("You can use no more than one %(type_s)s in total.",
+                         "You can use no more than %(max_number)d %(type_pl)s "
+                         "in total.",
+                         tokens['max_number']) % tokens
         else:
             result += \
                 _("You have no limitations on how you use them.") % tokens
+    else:
+        raise ValueError("Unexpected token mode '%s'" % tokens["mode"])
 
     return result
 
@@ -325,17 +149,3 @@ def get_score_class(score, max_score):
         return "score_100"
     else:
         return "score_0_100"
-
-
-def encode_for_url(url_fragment):
-    """Return the string encoded safely for becoming a url fragment.
-
-    In particular, this means encoding it to UTF-8 and then
-    percent-encoding it.
-
-    url_fragment(unicode): the string to be encoded.
-
-    return (str): the encoded string.
-
-    """
-    return quote(url_fragment.encode('utf-8'), safe='')
