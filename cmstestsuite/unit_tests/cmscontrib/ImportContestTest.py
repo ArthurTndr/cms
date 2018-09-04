@@ -125,8 +125,8 @@ class TestImportContest(DatabaseMixin, unittest.TestCase):
                   delete_stale_participations=False):
         """Create an importer and call do_import in a convenient way"""
         return ContestImporter(
-            "path", True, False, import_tasks, update_contest, update_tasks,
-            False, delete_stale_participations,
+            "path", True, False, [], import_tasks, update_contest,
+            update_tasks, False, delete_stale_participations,
             fake_loader_factory(contest, contest_has_changed,
                                 tasks, participations)).do_import()
 
