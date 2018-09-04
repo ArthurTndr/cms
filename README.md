@@ -1,5 +1,7 @@
-Contest Management System
+INSAlgo Contest Management System
 =========================
+
+*This is an adaptation of CMS to our needs.*
 
 Homepage: <http://cms-dev.github.io/>
 
