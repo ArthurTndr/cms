@@ -26,27 +26,13 @@ def make_timedelta(t):
 
 
 def random_password(length=10):
-    chars = string.ascii_uppercase + string.digits + string.ascii_lowercase + '_-'
+    chars = (
+        string.ascii_uppercase + string.digits + string.ascii_lowercase
+        + '_-')
     password = ''
     for i in range(length):
         password += chars[ord(os.urandom(1)) % len(chars)]
     return password
-
-
-# Code from https://docs.python.org/2.7/library/csv.html#examples
-def unicode_csv_reader(unicode_csv_data, **kwargs):
-    # csv.py doesn't do Unicode; encode temporarily as UTF-8:
-    csv_reader = csv.reader(utf_8_encoder(unicode_csv_data),
-                            delimiter=str(';'),
-                            quotechar=str('"'),
-                            **kwargs)
-    for row in csv_reader:
-        # decode UTF-8 back to Unicode, cell by cell:
-        yield [unicode(cell, 'utf-8') for cell in row]
-
-def utf_8_encoder(unicode_csv_data):
-    for line in unicode_csv_data:
-        yield line.encode('utf-8')
 
 
 # Code from https://docs.python.org/2.7/library/csv.html#examples
@@ -60,6 +46,7 @@ def unicode_csv_reader(unicode_csv_data, **kwargs):
         # decode UTF-8 back to Unicode, cell by cell:
         yield [unicode(cell, 'utf-8') for cell in row]
 
+
 def utf_8_encoder(unicode_csv_data):
     for line in unicode_csv_data:
         yield line.encode('utf-8')
@@ -67,7 +54,6 @@ def utf_8_encoder(unicode_csv_data):
 
 class ShakerUserLoader(YamlLoader):
     """Load users stored using the Shaker format.
-
     """
 
     short_name = 'shaker_format'
@@ -76,23 +62,21 @@ class ShakerUserLoader(YamlLoader):
     @staticmethod
     def detect(path):
         """See docstring in class Loader.
-
         """
         return os.path.exists(
             os.path.join(os.path.dirname(path), "users.csv"))
 
     def user_has_changed(self):
         """See docstring in class Loader.
-
         """
         return True
 
     def get_user_loader(self, username):
-        return ShakerUserLoader(os.path.join(self.path, username), self.file_cacher)
+        return ShakerUserLoader(
+            os.path.join(self.path, username), self.file_cacher)
 
     def get_user(self):
         """See docstring in class Loader.
-
         """
 
         username = os.path.basename(self.path)
@@ -108,9 +92,11 @@ class ShakerUserLoader(YamlLoader):
         # (additionnal columns are accepted, and order isn't important)
         #
 
-        users_path = os.path.join(os.path.dirname(self.path), 'contestants.csv')
+        users_path = os.path.join(
+            os.path.dirname(self.path), 'contestants.csv')
         if not os.path.exists(users_path):
-            users_path = os.path.join(os.path.dirname(self.path), '../contestants.csv')
+            users_path = os.path.join(
+                os.path.dirname(self.path), '../contestants.csv')
         if not os.path.exists(users_path):
             logger.critical("contestants.csv not found!")
             exit(1)
@@ -163,11 +149,13 @@ class ShakerUserLoader(YamlLoader):
                 logger.info("User parameters loaded.")
                 return User(**args)
             else:
-                logger.critical("User %s not found in contestants.csv file.", username)
+                logger.critical(
+                    "User %s not found in contestants.csv file.", username)
                 exit(1)
                 return None
         except KeyError as e:
-            logger.critical("contestants.csv is ill-formed: column %s not found!", e)
+            logger.critical(
+                "contestants.csv is ill-formed: column %s not found!", e)
             exit(1)
             return None
 
@@ -178,23 +166,27 @@ class ShakerUserLoader(YamlLoader):
 
         participations = []
         try:
-            users_path = os.path.join(os.path.dirname(self.path) + "/contestants.csv")
+            users_path = os.path.join(
+                os.path.dirname(self.path) + "/contestants.csv")
             searched_locations = []
             if not os.path.exists(users_path):
                 searched_locations.append(users_path)
                 users_path = os.path.join(self.path + "/contestants.csv")
             if not os.path.exists(users_path):
                 searched_locations.append(users_path)
-                users_path = os.path.join(os.path.dirname(self.path), "../contestants.csv")
+                users_path = os.path.join(
+                    os.path.dirname(self.path), "../contestants.csv")
             if not os.path.exists(users_path):
                 searched_locations.append(users_path)
-                logger.warning("contestants.csv not found! (searched in %s, %s and %s)",
-                               *searched_locations)
+                logger.warning(
+                    "contestants.csv not found! (searched in %s, %s and %s)",
+                    *searched_locations)
                 logger.warning("Participations won't be loaded.")
 
             if os.path.exists(users_path):
                 # Read contestants
-                with io.open(users_path, str("rt"), encoding=str("utf-8")) as users_file:
+                with io.open(users_path, str("rt"), encoding=str("utf-8")) \
+                        as users_file:
                     reader = unicode_csv_reader(users_file)
 
                     # Headers
