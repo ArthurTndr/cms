@@ -125,7 +125,7 @@ class ContestImporter(object):
                         set(p["username"] for p in participations))
                 for p in participations:
                     self._participation_to_db(session, contest, p,
-                                              self.import_users)
+                                              self.import_users, self.loader)
 
             except ImportDataError as e:
                 logger.error(str(e))
@@ -249,7 +249,7 @@ class ContestImporter(object):
         return task
 
     @staticmethod
-    def _participation_to_db(session, contest, new_p, import_users):
+    def _participation_to_db(session, contest, new_p, import_users, loader):
         """Add the new participation to the DB and attach it to the contest
 
         session (Session): session to use.
@@ -268,12 +268,12 @@ class ContestImporter(object):
             .filter(User.username == new_p["username"]).first()
         if user is None:
             if import_users:
-                user = self.loader.get_user_loader(p["username"]).get_user()
+                user = loader.get_user_loader(new_p["username"]).get_user()
                 if user:
                     session.add(user)
                 else:
                     logger.critical("Could not import user \"%s\".",
-                                    p["username"])
+                                    new_p["username"])
                     return False
             else:
                 raise ImportDataError("User \"%s\" not found in database. "

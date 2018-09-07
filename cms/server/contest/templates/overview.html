@@ -16,10 +16,10 @@
         <h2 style="margin-top: 0">{{ _("General information") }}</h2>
         <p>
         {% if contest.presentation != "" %}
-            {% raw contest.presentation %}
+            {{ contest.presentation }}
             <br>
             <br>
-        {% end %}
+        {% endif %}
 
 {% if phase == -1 %}
         {% trans %}The contest hasn't started yet.{% endtrans %}

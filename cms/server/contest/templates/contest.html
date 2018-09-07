@@ -158,8 +158,8 @@ $(document).ready(function () {
                                 <img src="{{ url_root }}{{ contest.path_to_logo }}">
                             {% else %}
                                 <img src="{{ contest.path_to_logo }}">
-                            {% end %}
-                    {% end %}
+                            {% endif %}
+                    {% endif %}
                     <h3 id="server_time_box">
                         <span id="server_time_label">{% trans %}Server time:{% endtrans %}</span>
                         <span id="server_time"></span>
