@@ -14,13 +14,15 @@
 <div class="row">
     <div class="{% if contest.per_user_time is not none %}span5{% else %}span9{% endif %}">
         <h2 style="margin-top: 0">{{ _("General information") }}</h2>
-        <p>
-        {% if contest.presentation != "" %}
-            {{ contest.presentation }}
-            <br>
-            <br>
-        {% endif %}
 
+{% if contest.presentation != "" %}
+            <p>
+                {{ contest.presentation }}
+            </p>
+            <hr><br>
+{% endif %}
+
+        <p>
 {% if phase == -1 %}
         {% trans %}The contest hasn't started yet.{% endtrans %}
         </p>
@@ -187,22 +189,12 @@
 <h2>{% trans %}Task overview{% endtrans %}</h2>
 
 <table class="table table-bordered table-striped">
-    <!-- <colgroup>
-        <col class="task"/>
-        <col class="time_limit"/>
-        <col class="memory_limit"/>
-        <col class="n_inputs"/>
-        <col class="task_type"/>
-        <col class="files"/>
-    </colgroup> -->
     <thead>
         <tr>
             <th>{% trans %}Task{% endtrans %}</th>
             <th>{% trans %}Name{% endtrans %}</th>
             <th>{% trans %}Time limit{% endtrans %}</th>
             <th>{% trans %}Memory limit{% endtrans %}</th>
-            <th>{% trans %}Type{% endtrans %}</th>
-            <th>{% trans %}Files{% endtrans %}</th>
 {% if tokens_contest != TOKEN_MODE_DISABLED and tokens_tasks != TOKEN_MODE_DISABLED %}
             <th>{% trans %}Tokens{% endtrans %}</th>
 {% endif %}
@@ -228,8 +220,6 @@
         {% trans %}N/A{% endtrans %}
     {% endif %}
             </td>
-            <td>{{ get_task_type(dataset=t_iter.active_dataset).name }}</td>
-            <td>{{ t_iter.submission_format|map("replace", ".%l", extensions)|join(" ") }}</td>
     {% if tokens_contest != TOKEN_MODE_DISABLED and tokens_tasks != TOKEN_MODE_DISABLED %}
             <td>
         {% if t_iter.token_mode == TOKEN_MODE_FINITE or t_iter.token_mode == TOKEN_MODE_INFINITE %}

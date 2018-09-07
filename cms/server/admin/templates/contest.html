@@ -42,22 +42,8 @@
     </tr>
     <tr>
       <td>
-        <span class="info" title="A localized text presenting the contest to the contestants."></span>
-        Presentation
-      </td>
-      <td><textarea name="presentation">{{ contest.presentation }}</textarea></td>
-    </tr>
-    <tr>
-      <td>
-        <span class="info" title="The path leading to the logo image on the server. Leave blank if you don't want to put a logo on this contest."></span>
-        Path to logo
-      </td>
-      <td><textarea name="path_to_logo">{{ contest.path_to_logo }}</textarea></td>
-    </tr>
-    <tr>
-      <td>
         <span class="info" title="The list of languages that contestants can use, or empty for allowing any language.
-                                  Example: 'en,ja' (without quotes)."></span>
+        Example: 'en,ja' (without quotes)."></span>
         Allowed localizations
       </td>
       <td><input type="text" name="allowed_localizations" value="{{ contest.allowed_localizations|join(",") }}"/></td>

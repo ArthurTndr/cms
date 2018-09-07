@@ -176,7 +176,8 @@ class YamlLoader(ContestLoader, TaskLoader, UserLoader, TeamLoader):
         load(conf, args, "presentation")
         load(conf, args, "path_to_logo")
         load(conf, args, "timezone")
-        load(conf, args, "timezone")
+
+        load(conf, args, "allowed_localizations")
 
         logger.info("Loading parameters for contest %s.", args["name"])
 
@@ -373,27 +374,48 @@ class YamlLoader(ContestLoader, TaskLoader, UserLoader, TeamLoader):
 
         logger.info("Loading parameters for task %s.", name)
 
+        # This adds support for the importation of the statements in multiple
+        # languages while keeping compatibility with the old format.old
+        # Either primary_language or primary_statements or both can be set.
+        # statement.pdf or testo.pdf must correspond to the primary language,
+        # and statement_xx.pdf corresponds to the language xx.
         if get_statement:
+            primary_statements = load(conf, None, "primary_statements")
             primary_language = load(conf, None, "primary_language")
-            if primary_language is None:
+            if primary_statements and not primary_language:
+                primary_language = primary_statements[0]
+            elif not primary_statements and not primary_language:
                 primary_language = 'it'
-            paths = [os.path.join(self.path, "statement", "statement.pdf"),
-                     os.path.join(self.path, "testo", "testo.pdf")]
-            for path in paths:
-                if os.path.exists(path):
-                    digest = self.file_cacher.put_file_from_path(
-                        path,
-                        "Statement for task %s (lang: %s)" %
-                        (name, primary_language))
-                    break
-            else:
+            primary_statements = primary_statements or []
+            if primary_language not in primary_statements:
+                primary_statements.append(primary_language)
+
+            statements = {}
+            for language in primary_statements:
+                paths = [
+                    os.path.join(self.path, "statement", "statement_%s.pdf")
+                    % language
+                ]
+                if language == primary_language:
+                    paths += [
+                        os.path.join(self.path, "statement", "statement.pdf"),
+                        os.path.join(self.path, "testo", "testo.pdf")
+                    ]
+                for path in paths:
+                    if os.path.exists(path):
+                        digest = self.file_cacher.put_file_from_path(
+                            path,
+                            "Statement for task %s (lang: %s)" %
+                            (name, language))
+                        statements[language] = Statement(language, digest)
+                        break
+
+            if not statements:
                 logger.critical("Couldn't find any task statement, aborting.")
                 sys.exit(1)
-            args["statements"] = {
-                primary_language: Statement(primary_language, digest)
-            }
 
-            args["primary_statements"] = [primary_language]
+            args["statements"] = statements
+            args["primary_statements"] = statements.keys()
 
         args["submission_format"] = ["%s.%%l" % name]
 
