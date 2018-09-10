@@ -17,7 +17,7 @@
 
 {% if contest.presentation != "" %}
             <p>
-                {{ contest.presentation }}
+                {{ contest.presentation|format_markdown }}
             </p>
             <hr><br>
 {% endif %}

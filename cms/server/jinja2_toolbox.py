@@ -32,9 +32,10 @@ from __future__ import unicode_literals
 from future.builtins.disabled import *  # noqa
 from future.builtins import *  # noqa
 from six import iterkeys, itervalues, iteritems
+import markdown
 
 from jinja2 import Environment, StrictUndefined, contextfilter, \
-    contextfunction, environmentfunction
+    contextfunction, environmentfunction, Markup
 
 from cms.db import SubmissionResult, UserTestResult
 from cmscommon.datetime import make_datetime, make_timestamp, utc, local_tz
@@ -270,6 +271,24 @@ def wrapped_format_status_text(ctx, status_text):
     return format_status_text(status_text, translation=translation)
 
 
+@contextfilter
+def format_markdown(ctx, md_text):
+    """A filter that parses markdown to html.
+    """
+    extensions = [
+        "markdown.extensions.extra",
+        "markdown.extensions.codehilite",
+        "markdown.extensions.smarty",
+        "markdown.extensions.nl2br",
+    ]
+
+    md = markdown.Markdown(safe_mode=True,
+                           extensions=extensions)
+    html_txt = md.convert(md_text)
+
+    return Markup(html_txt)
+
+
 def instrument_formatting_toolbox(env):
     env.filters["format_datetime"] = format_datetime
     env.filters["format_time"] = format_time
@@ -281,6 +300,8 @@ def instrument_formatting_toolbox(env):
     env.filters["format_locale"] = format_locale
 
     env.filters["format_status_text"] = wrapped_format_status_text
+
+    env.filters["format_markdown"] = format_markdown
 
 
 GLOBAL_ENVIRONMENT = Environment(
