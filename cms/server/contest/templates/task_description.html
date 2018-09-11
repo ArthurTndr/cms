@@ -9,7 +9,21 @@
 
 
 <div class="page-header">
-    <h1>{% trans name=task.title, short_name=task.name %}{{ name }} ({{ short_name }}) <small>description</small>{% endtrans %}</h1>
+    <h1>
+        {% if task.title_translations and cookie_translation and cookie_translation.identifier in task.title_translations %}
+            {{ task.title_translations[cookie_translation.identifier].title }}
+        {% else %}
+            {{ task.title }}
+        {% endif %}
+
+        {% if task.name_translations and cookie_translation and cookie_translation.identifier in task.name_translations %}
+            ({{ task.name_translations[cookie_translation.identifier].name }})
+        {% else %}
+            ({{ task.name }})
+        {% endif %}
+
+        <small>{% trans %}description{% endtrans %}</small>
+    </h1>
 </div>
 
 

@@ -182,7 +182,11 @@ $(document).ready(function () {
     {% if actual_phase == 0 or actual_phase == 3 or participation.unrestricted %}
         {% for t_iter in contest.tasks %}
                             <li class="nav-header">
-                                {{ t_iter.name }}
+                                {% if t_iter.name_translations and cookie_translation and cookie_translation.identifier in t_iter.name_translations %}
+                                    {{ t_iter.name_translations[cookie_translation.identifier].name }}
+                                {% else %}
+                                    {{ t_iter.name }}
+                                {% endif %}
                             </li>
                             <li{% if page == "task_description" and task == t_iter %} class="active"{% endif %}>
                                 <a href="{{ contest_url("tasks", t_iter.name, "description") }}">{% trans %}Statement{% endtrans %}</a>

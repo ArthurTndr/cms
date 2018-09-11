@@ -41,7 +41,7 @@ from datetime import timedelta
 
 from cms import TOKEN_MODE_DISABLED, TOKEN_MODE_FINITE, TOKEN_MODE_INFINITE
 from cms.db import Contest, User, Task, Statement, Attachment, Team, Dataset, \
-    Manager, Testcase
+    Manager, Testcase, TaskName, TaskTitle, Presentation
 from cms.grading.languagemanager import LANGUAGES, HEADER_EXTS
 from cmscommon.constants import SCORE_MODE_MAX, SCORE_MODE_MAX_TOKENED_LAST
 from cmscommon.crypto import build_password
@@ -176,6 +176,16 @@ class YamlLoader(ContestLoader, TaskLoader, UserLoader, TeamLoader):
         load(conf, args, "presentation")
         load(conf, args, "path_to_logo")
         load(conf, args, "timezone")
+
+        pr_temp = load(conf, None, ["presentation_translations"])
+        if pr_temp:
+            presentation_translations = {
+                language: Presentation(language, pr_temp[language])
+                for language in pr_temp
+            }
+        else:
+            presentation_translations = {}
+        args["presentation_translations"] = presentation_translations
 
         load(conf, args, "allowed_localizations")
 
@@ -361,6 +371,28 @@ class YamlLoader(ContestLoader, TaskLoader, UserLoader, TeamLoader):
         load(conf, args, ["name", "nome_breve"])
         load(conf, args, ["title", "nome"])
 
+        nt_temp = load(conf, None, ["name_translations"])
+        if nt_temp:
+            name_translations = {
+                language: TaskName(language, nt_temp[language])
+                for language in nt_temp
+            }
+        else:
+            name_translations = {}
+        args["name_translations"] = name_translations
+
+        tt_temp = load(conf, None, ["title_translations"])
+        if tt_temp:
+            title_translations = {
+                language: TaskTitle(language, tt_temp[language])
+                for language in tt_temp
+            }
+        else:
+            title_translations = {}
+        args["title_translations"] = title_translations
+
+        # load(conf, args, ["title_translations"])
+
         if name != args["name"]:
             logger.info("The task name (%s) and the directory name (%s) are "
                         "different. The former will be used.", args["name"],
@@ -405,8 +437,8 @@ class YamlLoader(ContestLoader, TaskLoader, UserLoader, TeamLoader):
                     if os.path.exists(path):
                         digest = self.file_cacher.put_file_from_path(
                             path,
-                            "Statement for task %s (lang: %s)" %
-                            (name, language))
+                            "Statement for task %s (lang: %s)"
+                            % (name, language))
                         statements[language] = Statement(language, digest)
                         break
 

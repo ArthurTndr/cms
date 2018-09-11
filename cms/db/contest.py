@@ -37,10 +37,12 @@ from future.builtins import *  # noqa
 from datetime import datetime, timedelta
 
 from sqlalchemy.ext.orderinglist import ordering_list
-from sqlalchemy.schema import Column, ForeignKey, CheckConstraint
+from sqlalchemy.schema import Column, ForeignKey, CheckConstraint, \
+    UniqueConstraint
 from sqlalchemy.types import Integer, Unicode, DateTime, Interval, Enum, \
     Boolean, String
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.dialects.postgresql import ARRAY
 
 from cms import TOKEN_MODE_DISABLED, TOKEN_MODE_FINITE, TOKEN_MODE_INFINITE
@@ -75,11 +77,19 @@ class Contest(Base):
     description = Column(
         Unicode,
         nullable=False)
-    # Presentation of the contest (human readable).
+
+    # Primary presentation of the contest (human readable).
     presentation = Column(
         Unicode,
         default="",
         nullable=False)
+    # Translations
+    presentation_translations = relationship(
+        "Presentation",
+        collection_class=attribute_mapped_collection("language"),
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        back_populates="contest")
 
     # The list of language codes of the localizations that contestants
     # are allowed to use (empty means all).
@@ -352,3 +362,43 @@ class Announcement(Base):
     contest = relationship(
         Contest,
         back_populates="announcements")
+
+
+class Presentation(Base):
+    """Class to store a translation of the contest presentation.
+    """
+
+    __tablename__ = 'presentation'
+    __table_args__ = (
+        UniqueConstraint('contest_id', 'language'),
+    )
+
+    # Auto increment primary key.
+    id = Column(
+        Integer,
+        primary_key=True)
+
+    # Contest (id and object) which title it is.
+    contest_id = Column(
+        Integer,
+        ForeignKey(Contest.id,
+                   onupdate="CASCADE", ondelete="CASCADE"),
+        nullable=False,
+        index=True)
+    contest = relationship(
+        Contest,
+        back_populates="presentation_translations")
+
+    # Code for the language the presentation is written in.
+    # It can be an arbitrary string, but if it's in the form "en" or "en_US"
+    # it will be rendered appropriately on the interface (i.e. "English" and
+    # "English (United States of America)"). These codes need to be taken from
+    # ISO 639-1 and ISO 3166-1 respectively.
+    language = Column(
+        Unicode,
+        nullable=False)
+
+    # Language of the translation
+    presentation = Column(
+        Unicode,
+        nullable=False)

@@ -28,11 +28,31 @@
     </tr>
     <tr>
       <td>
-        <span class="info" title="A localized text presenting the contest to the contestants."></span>
+        <span class="info" title="A text presenting the contest to the contestants in the default language."></span>
         Presentation
       </td>
       <td><textarea name="presentation">{{ contest.presentation }}</textarea></td>
     </tr>
+    {% if contest.presentation_translations %}
+      <tr>
+        <td>
+          <span class="info" title="The translations of the contest presentation."></span>
+          Presentation translations
+        </td>
+        <td>
+          <table>
+            <tbody>
+            {% for presentation_translation in itervalues(contest.presentation_translations) %}
+              <tr>
+                <td>{{ presentation_translation.language }}</td>
+                <td><textarea name="presentation_{{ presentation_translation.language }}">{{ presentation_translation.presentation }}</textarea></td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      {% endif %}
     <tr>
       <td>
         <span class="info" title="The path leading to the logo image on the server. Leave blank if you don't want to put a logo on this contest."></span>

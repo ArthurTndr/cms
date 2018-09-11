@@ -54,6 +54,27 @@ $("select[name=task_type_{{ dataset.id }}]").change(function() {
         </td>
         <td><input type="text" name="name" value="{{ task.name }}"/></td>
       </tr>
+      {% if task.name_translations %}
+      <tr>
+        <td>
+          <span class="info" title="The translations of the task name (using
+          only  letters, numbers and underscore)."></span>
+          Name translations
+        </td>
+        <td>
+          <table>
+            <tbody>
+            {% for name_translation in itervalues(task.name_translations) %}
+              <tr>
+                <td>{{ name_translation.language }}</td>
+                <td><input type="text" name="name_{{ name_translation.language }}" value="{{ name_translation.name }}"/></td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      {% endif %}
       <tr>
         <td>
           <span class="info" title="The title of the task as seen by the contestants."></span>
@@ -61,6 +82,26 @@ $("select[name=task_type_{{ dataset.id }}]").change(function() {
         </td>
         <td><input type="text" name="title" value="{{ task.title }}"/></td>
       </tr>
+      {% if task.title_translations %}
+      <tr>
+        <td>
+          <span class="info" title="The translations of the task title."></span>
+          Title translations
+        </td>
+        <td>
+          <table>
+            <tbody>
+            {% for title_translation in itervalues(task.title_translations) %}
+              <tr>
+                <td>{{ title_translation.language }}</td>
+                <td><input type="text" name="title_{{ title_translation.language }}" value="{{ title_translation.title }}"/></td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      {% endif %}
       <tr>
         <td>
           <span class="info" title="The index of the task within the contest, if the task is associated with a contest."></span>

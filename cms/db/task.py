@@ -105,6 +105,20 @@ class Task(Base):
         Unicode,
         nullable=False)
 
+    name_translations = relationship(
+        "TaskName",
+        collection_class=attribute_mapped_collection("language"),
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        back_populates="task")
+
+    title_translations = relationship(
+        "TaskTitle",
+        collection_class=attribute_mapped_collection("language"),
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+        back_populates="task")
+
     # The names of the files that the contestant needs to submit (with
     # language-specific extensions replaced by "%l").
     submission_format = Column(
@@ -310,6 +324,86 @@ class Statement(Base):
     # Digest of the file.
     digest = Column(
         Digest,
+        nullable=False)
+
+
+class TaskName(Base):
+    """Class to store a translation of the task name.
+    """
+
+    __tablename__ = 'taskname'
+    __table_args__ = (
+        UniqueConstraint('task_id', 'language'),
+    )
+
+    # Auto increment primary key.
+    id = Column(
+        Integer,
+        primary_key=True)
+
+    # Task (id and object) which name it is.
+    task_id = Column(
+        Integer,
+        ForeignKey(Task.id,
+                   onupdate="CASCADE", ondelete="CASCADE"),
+        nullable=False,
+        index=True)
+    task = relationship(
+        Task,
+        back_populates="name_translations")
+
+    # Code for the language the name is written in.
+    # It can be an arbitrary string, but if it's in the form "en" or "en_US"
+    # it will be rendered appropriately on the interface (i.e. "English" and
+    # "English (United States of America)"). These codes need to be taken from
+    # ISO 639-1 and ISO 3166-1 respectively.
+    language = Column(
+        Unicode,
+        nullable=False)
+
+    # Language of the translation
+    name = Column(
+        Unicode,
+        nullable=False)
+
+
+class TaskTitle(Base):
+    """Class to store a translation of the task title.
+    """
+
+    __tablename__ = 'tasktitle'
+    __table_args__ = (
+        UniqueConstraint('task_id', 'language'),
+    )
+
+    # Auto increment primary key.
+    id = Column(
+        Integer,
+        primary_key=True)
+
+    # Task (id and object) which title it is.
+    task_id = Column(
+        Integer,
+        ForeignKey(Task.id,
+                   onupdate="CASCADE", ondelete="CASCADE"),
+        nullable=False,
+        index=True)
+    task = relationship(
+        Task,
+        back_populates="title_translations")
+
+    # Code for the language the title is written in.
+    # It can be an arbitrary string, but if it's in the form "en" or "en_US"
+    # it will be rendered appropriately on the interface (i.e. "English" and
+    # "English (United States of America)"). These codes need to be taken from
+    # ISO 639-1 and ISO 3166-1 respectively.
+    language = Column(
+        Unicode,
+        nullable=False)
+
+    # Language of the translation
+    title = Column(
+        Unicode,
         nullable=False)
 
 

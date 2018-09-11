@@ -15,7 +15,12 @@
     <div class="{% if contest.per_user_time is not none %}span5{% else %}span9{% endif %}">
         <h2 style="margin-top: 0">{{ _("General information") }}</h2>
 
-{% if contest.presentation != "" %}
+{% if contest.presentation_translations and cookie_translation and cookie_translation.identifier in contest.presentation_translations %}
+            <p>
+                {{ contest.presentation_translations[cookie_translation.identifier].presentation|format_markdown }}
+            </p>
+            <hr><br>
+{% elif contest.presentation %}
             <p>
                 {{ contest.presentation|format_markdown }}
             </p>

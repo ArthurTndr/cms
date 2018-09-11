@@ -92,6 +92,16 @@ class ContestHandler(SimpleContestHandler("contest.html")):
 
             assert attrs.get("name") is not None, "No contest name specified."
 
+            # Parsing of presentation translations. Their name is
+            # presentation_XX where XX is the language code
+            pr_form = {}
+            for language in contest.presentation_translations:
+                self.get_string(pr_form, "presentation_%s" % language)
+            for k in pr_form:
+                contest.presentation_translations[
+                    k.replace("presentation_", "", 1)]\
+                    .presentation = pr_form[k]
+
             allowed_localizations = \
                 self.get_argument("allowed_localizations", "")
             if allowed_localizations:

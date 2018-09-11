@@ -147,6 +147,24 @@ class TaskHandler(BaseHandler):
                 if primary_statements[k]
             ]))
 
+            # Parsing of name translations. Their name is name_XX where XX is
+            # the language code
+            nt_form = {}
+            for language in task.name_translations:
+                self.get_string(nt_form, "name_%s" % language)
+            for k in nt_form:
+                task.name_translations[k.replace("name_", "", 1)].name \
+                    = nt_form[k]
+
+            # Parsing of title translations. Their name is title_XX where XX
+            # is the language code
+            tt_form = {}
+            for language in task.title_translations:
+                self.get_string(tt_form, "title_%s" % language)
+            for k in tt_form:
+                task.title_translations[k.replace("title_", "", 1)].title \
+                    = tt_form[k]
+
             self.get_submission_format(attrs)
             self.get_string(attrs, "feedback_level")
 
