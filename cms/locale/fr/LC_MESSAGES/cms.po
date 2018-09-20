@@ -489,13 +489,8 @@ msgstr "Automatique (%(lang)s)"
 msgid "Logout"
 msgstr "Se déconnecter"
 
-#, python-format
-msgid ""
-"Logged in as <strong>%(first_name)s %(last_name)s</strong> "
-"<em>(%(username)s)</em>"
-msgstr ""
-"Connecté en tant que <strong>%(first_name)s %(last_name)s</strong> "
-"<em>(%(username)s)</em>"
+msgid "Logged in as"
+msgstr "Connecté en tant que"
 
 msgid "Failed to log in."
 msgstr "Connexion impossible"
@@ -514,6 +509,9 @@ msgstr "Mot de passe"
 
 msgid "Login"
 msgstr "Se connecter"
+
+msgid "Secure authentication"
+msgstr "Authentification sécurisée"
 
 msgid "Reset"
 msgstr "Effacer"
