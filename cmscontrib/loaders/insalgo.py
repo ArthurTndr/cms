@@ -1,7 +1,16 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# By Thomas Lacroix, with no warranty.
+# Copyright © 2017 Thomas Lacroix
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU Affero General Public License for more details.
+
+"""This loader is an extension of the italy_yaml loader, intended to
+be used only to tweak the user import.
+"""
 
 from __future__ import absolute_import
 from __future__ import print_function

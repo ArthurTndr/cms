@@ -10,6 +10,7 @@
 # Copyright © 2014 Artem Iglikov <artem.iglikov@gmail.com>
 # Copyright © 2014 Fabian Gundlach <320pointsguy@gmail.com>
 # Copyright © 2015-2016 William Di Luigi <williamdiluigi@gmail.com>
+# Copyright © 2018 Louis Sugy <contact@nyri0.fr>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -35,7 +36,6 @@ from __future__ import unicode_literals
 from future.builtins.disabled import *  # noqa
 from future.builtins import *  # noqa
 
-import ipaddress
 import json
 import logging
 
@@ -45,7 +45,6 @@ from cms import config
 from cms.db import PrintJob
 from cms.grading.steps import COMPILATION_MESSAGES, EVALUATION_MESSAGES
 from cms.server import multi_contest
-from cms.server.contest.authentication import validate_login
 from cms.server.contest.communication import get_communications
 from cms.server.contest.printing import accept_print_job, PrintingDisabled, \
     UnacceptablePrintJob
@@ -71,52 +70,6 @@ class MainHandler(ContestHandler):
     @multi_contest
     def get(self):
         self.render("overview.html", **self.r_params)
-
-
-class LoginHandler(ContestHandler):
-    """Login handler.
-
-    """
-    @multi_contest
-    def post(self):
-        error_args = {"login_error": "true"}
-        next_page = self.get_argument("next", None)
-        if next_page is not None:
-            error_args["next"] = next_page
-            if next_page != "/":
-                next_page = self.url(*next_page.strip("/").split("/"))
-            else:
-                next_page = self.url()
-        else:
-            next_page = self.contest_url()
-        error_page = self.contest_url(**error_args)
-
-        username = self.get_argument("username", "")
-        password = self.get_argument("password", "")
-
-        try:
-            # In py2 Tornado gives us the IP address as a native binary
-            # string, whereas ipaddress wants text (unicode) strings.
-            ip_address = ipaddress.ip_address(str(self.request.remote_ip))
-        except ValueError:
-            logger.warning("Invalid IP address provided by Tornado: %s",
-                           self.request.remote_ip)
-            return None
-
-        participation, cookie = validate_login(
-            self.sql_session, self.contest, self.timestamp, username, password,
-            ip_address)
-
-        cookie_name = self.contest.name + "_login"
-        if cookie is None:
-            self.clear_cookie(cookie_name)
-        else:
-            self.set_secure_cookie(cookie_name, cookie, expires_days=None)
-
-        if participation is None:
-            self.redirect(error_page)
-        else:
-            self.redirect(next_page)
 
 
 class StartHandler(ContestHandler):

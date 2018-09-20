@@ -10,6 +10,7 @@
 # Copyright © 2015 Luca Chiodini <luca@chiodini.org>
 # Copyright © 2016 Andrea Cracco <guilucand@gmail.com>
 # Copyright © 2018 Edoardo Morassutto <edoardo.morassutto@gmail.com>
+# Copyright © 2018 Louis Sugy <contact@nyri0.fr>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -177,7 +178,7 @@ class YamlLoader(ContestLoader, TaskLoader, UserLoader, TeamLoader):
         load(conf, args, "path_to_logo")
         load(conf, args, "timezone")
 
-        pr_temp = load(conf, None, ["presentation_translations"])
+        pr_temp = load(conf, None, "presentation_translations")
         if pr_temp:
             presentation_translations = {
                 language: Presentation(language, pr_temp[language])
@@ -186,6 +187,13 @@ class YamlLoader(ContestLoader, TaskLoader, UserLoader, TeamLoader):
         else:
             presentation_translations = {}
         args["presentation_translations"] = presentation_translations
+
+        # Authentication methods
+        oic_info = load(conf, None, "oic_info")
+        if oic_info:
+            args["auth_type"] = "OpenIDConnect"
+            with open(os.path.join(self.path, oic_info), "r") as f:
+                args["openidconnect_info"] = f.read()
 
         load(conf, args, "allowed_localizations")
 

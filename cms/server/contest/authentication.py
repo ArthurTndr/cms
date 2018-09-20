@@ -12,6 +12,7 @@
 # Copyright © 2015-2016 William Di Luigi <williamdiluigi@gmail.com>
 # Copyright © 2016 Myungwoo Chun <mc.tamaki@gmail.com>
 # Copyright © 2016 Amir Keivan Mohtashami <akmohtashami97@gmail.com>
+# Copyright © 2018 Louis Sugy <contact@nyri0.fr>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -353,8 +354,8 @@ def _authenticate_request_from_cookie(sql_session, contest, timestamp, cookie):
         return None, None
 
     logger.info("Successful cookie authentication as user %r, on contest %s, "
-                "returning from %s, at %s", username, contest.name, last_update,
-                timestamp)
+                "returning from %s, at %s",
+                username, contest.name, last_update, timestamp)
 
     return (participation,
             json.dumps([username, password, make_timestamp(timestamp)]))

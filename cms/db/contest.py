@@ -9,6 +9,7 @@
 # Copyright © 2013 Bernard Blackham <bernard@largestprime.net>
 # Copyright © 2016 Myungwoo Chun <mc.tamaki@gmail.com>
 # Copyright © 2016 Amir Keivan Mohtashami <akmohtashami97@gmail.com>
+# Copyright © 2018 Louis Sugy <contact@nyri0.fr>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -46,7 +47,6 @@ from sqlalchemy.orm.collections import attribute_mapped_collection
 from sqlalchemy.dialects.postgresql import ARRAY
 
 from cms import TOKEN_MODE_DISABLED, TOKEN_MODE_FINITE, TOKEN_MODE_INFINITE
-
 from . import Codename, Base
 
 
@@ -90,6 +90,18 @@ class Contest(Base):
         cascade="all, delete-orphan",
         passive_deletes=True,
         back_populates="contest")
+
+    # Name of the authentication method
+    auth_type = Column(
+        Unicode,
+        default="Password",
+        nullable=False)
+
+    # OpenIDConnect config (JSON)
+    openidconnect_info = Column(
+        Unicode,
+        default="",
+        nullable=True)
 
     # The list of language codes of the localizations that contestants
     # are allowed to use (empty means all).

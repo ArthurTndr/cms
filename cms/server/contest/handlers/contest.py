@@ -12,6 +12,7 @@
 # Copyright © 2015-2016 William Di Luigi <williamdiluigi@gmail.com>
 # Copyright © 2016 Myungwoo Chun <mc.tamaki@gmail.com>
 # Copyright © 2016 Amir Keivan Mohtashami <akmohtashami97@gmail.com>
+# Copyright © 2018 Louis Sugy <contact@nyri0.fr>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -49,6 +50,7 @@ from cms.server import FileHandlerMixin
 from cms.locale import filter_language_codes
 from cms.server.contest.authentication import authenticate_request
 from cmscommon.datetime import get_timezone
+from cms.server.authtypes import get_auth_type
 
 from ..phase_management import compute_actual_phase
 
@@ -174,6 +176,7 @@ class ContestHandler(BaseHandler):
         ret = super(ContestHandler, self).render_params()
 
         ret["contest"] = self.contest
+        ret["auth_type"] = get_auth_type(self.contest.auth_type)
 
         if self.contest_url is not None:
             ret["contest_url"] = self.contest_url
@@ -288,6 +291,25 @@ class ContestHandler(BaseHandler):
 
     def notify_error(self, subject, text):
         self.add_notification(subject, text, NOTIFICATION_ERROR)
+
+    def redirect_login_error(self):
+        error_args = {"login_error": "true"}
+        next_page = self.get_argument("next", None)
+        if next_page is not None:
+            error_args["next"] = next_page
+        error_page = self.contest_url(**error_args)
+        self.redirect(error_page)
+
+    def redirect_next(self):
+        next_page = self.get_argument("next", None)
+        if next_page is not None:
+            if next_page != "/":
+                next_page = self.url(*next_page.strip("/").split("/"))
+            else:
+                next_page = self.url()
+        else:
+            next_page = self.contest_url()
+        self.redirect(next_page)
 
 
 class FileHandler(ContestHandler, FileHandlerMixin):

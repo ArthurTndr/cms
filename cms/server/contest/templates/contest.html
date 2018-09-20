@@ -68,10 +68,13 @@ $(document).ready(function () {
                     </form>
                     <p class="navbar-text pull-right">
                         {% trans first_name=user.first_name,
-                                 last_name=user.last_name,
-                                 username=user.username %}
-                            Logged in as <strong>{{ first_name }} {{ last_name }}</strong> <em>({{ username }})</em>
+                                 last_name=user.last_name %}
+                            Logged in as <strong>{{ first_name }} {{ last_name }}</strong>
                         {% endtrans %}
+                        {% if contest.auth_type == "Password" %}
+                            <em>({{ user.username }})</em>
+                        {% endif %}
+                        &ensp;
                     </p>
 {% endif %}
                 </div>
@@ -90,33 +93,7 @@ $(document).ready(function () {
             <div class="login_box hero-unit">
                 <h1>{% trans %}Welcome{% endtrans %}</h1>
                 <p>{% trans %}Please log in{% endtrans %}</p>
-                <form class="form-horizontal" action="{{ contest_url("login") }}" method="POST">
-                    {{ xsrf_form_html|safe }}
-                    {% set next_page = handler.get_argument("next", none) %}
-                    {% if next_page is not none %}
-                    <input type="hidden" name="next" value="{{ next_page }}">
-                    {% endif %}
-                    <fieldset>
-                        <div class="control-group">
-                            <label class="control-label" for="username">{% trans %}Username{% endtrans %}</label>
-                            <div class="controls">
-                                <input type="text" class="input-xlarge" name="username" id="username">
-                            </div>
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label" for="password">{% trans %}Password{% endtrans %}</label>
-                            <div class="controls">
-                                <input type="password" class="input-xlarge" name="password" id="password">
-                            </div>
-                        </div>
-                        <div class="control-group">
-                            <div class="controls">
-                                <button type="submit" class="btn btn-primary btn-large">{% trans %}Login{% endtrans %}</button>
-                                <button type="reset" class="btn btn-large">{% trans %}Reset{% endtrans %}</button>
-                            </div>
-                        </div>
-                    </fieldset>
-                </form>
+                {% include auth_type.get_login_html() + ".html" with context %}
             </div>
         </div>
 {% else %}

@@ -25,6 +25,7 @@ pyxdg>=0.25,<0.26  # https://freedesktop.org/wiki/Software/pyxdg/
 Jinja2>=2.10,<2.11  # http://jinja.pocoo.org/docs/latest/changelog/
 Markdown>=2.6.11  # https://pypi.org/project/Markdown/#history
 Pygments>=2.2.0  # https://pypi.org/project/Pygments/#history
+oic>=0.14.0
 
 # Only for some importers:
 pyyaml>=3.12,<3.13  # http://pyyaml.org/wiki/PyYAML

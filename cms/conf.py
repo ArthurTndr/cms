@@ -8,6 +8,7 @@
 # Copyright © 2013 Luca Wehrstedt <luca.wehrstedt@gmail.com>
 # Copyright © 2014 Fabian Gundlach <320pointsguy@gmail.com>
 # Copyright © 2016 Myungwoo Chun <mc.tamaki@gmail.com>
+# Copyright © 2018 Louis Sugy <contact@nyri0.fr>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -169,6 +170,9 @@ class Config(object):
         self.max_pages_per_job = 10
         self.max_jobs_per_user = 10
         self.pdf_printing_allowed = False
+
+        # User authentication
+        self.auth_types = ["Password", "OpenIDConnect"]
 
         # Installed or from source?
         # We declare we are running from installed if the program was

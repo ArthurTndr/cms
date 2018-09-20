@@ -10,6 +10,7 @@
 # Copyright © 2014 Artem Iglikov <artem.iglikov@gmail.com>
 # Copyright © 2014 Fabian Gundlach <320pointsguy@gmail.com>
 # Copyright © 2015-2016 William Di Luigi <williamdiluigi@gmail.com>
+# Copyright © 2018 Louis Sugy <contact@nyri0.fr>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -32,7 +33,6 @@ from future.builtins.disabled import *  # noqa
 from future.builtins import *  # noqa
 
 from .main import \
-    LoginHandler, \
     LogoutHandler, \
     StartHandler, \
     NotificationsHandler, \
@@ -60,12 +60,13 @@ from .communication import \
     CommunicationHandler, \
     QuestionHandler
 
+from cms.server.authtypes import get_all_auth_types
+
 
 HANDLERS = [
 
     # Main
 
-    (r"/login", LoginHandler),
     (r"/logout", LogoutHandler),
     (r"/start", StartHandler),
     (r"/notifications", NotificationsHandler),
@@ -107,6 +108,10 @@ HANDLERS = [
     # * /static, defined in cms/io/web_service.py
     # * /stl, defined in cms/server/contest/server.py
 ]
+
+
+for auth_type in get_all_auth_types():
+    HANDLERS.extend(auth_type.get_url_handlers())
 
 
 __all__ = ["HANDLERS"]
