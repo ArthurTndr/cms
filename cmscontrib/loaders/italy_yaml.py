@@ -195,7 +195,13 @@ class YamlLoader(ContestLoader, TaskLoader, UserLoader, TeamLoader):
             with open(os.path.join(self.path, oic_info), "r") as f:
                 args["openidconnect_info"] = f.read()
 
+        # To limit the interface to a few languages
         load(conf, args, "allowed_localizations")
+
+        # Allowed programming languages
+        plang = load(conf, None, "allowed_languages")
+        if plang:
+            args["languages"] = plang
 
         logger.info("Loading parameters for contest %s.", args["name"])
 
