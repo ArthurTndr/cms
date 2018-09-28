@@ -201,7 +201,7 @@ class OpenIDConnectLoginHandler(ContestHandler):
         except ValueError:
             logger.warning("Invalid IP address provided by Tornado: %s",
                            self.request.remote_ip)
-            return None
+            ip_address = None
 
         _, password = parse_authentication(user.password)
         participation, cookie = validate_login(

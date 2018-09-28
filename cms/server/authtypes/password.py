@@ -59,7 +59,7 @@ class LoginHandler(ContestHandler):
         except ValueError:
             logger.warning("Invalid IP address provided by Tornado: %s",
                            self.request.remote_ip)
-            return None
+            ip_address = None
 
         participation, cookie = validate_login(
             self.sql_session, self.contest, self.timestamp, username, password,
