@@ -41,7 +41,7 @@ import io
 from sqlalchemy.orm import joinedload
 
 from cms.db import Contest
-from cms.grading.scoring import task_score
+from cms.grading.scoring import task_score, participation_last_progress
 
 from .base import BaseHandler, require_permission
 
@@ -56,7 +56,7 @@ class RankingHandler(BaseHandler):
         self.safe_get_item(Contest, contest_id)
 
         # This massive joined load gets all the information which we will need
-        # to generating the rankings.
+        # to generate the rankings.
         self.contest = self.sql_session.query(Contest)\
             .filter(Contest.id == contest_id)\
             .options(joinedload('participations'))\
@@ -82,8 +82,21 @@ class RankingHandler(BaseHandler):
             total_score = round(total_score, self.contest.score_precision)
             p.total_score = (total_score, partial)
 
+            # Calculate the time when the score of the participation last
+            # increased
+            p.last_progress = participation_last_progress(p)
+
         self.r_params = self.render_params()
+        contest = self.r_params["contest"]
+
+        sorted_participations = sorted(
+            contest.participations,
+            key=lambda p: (-p.total_score[0],
+                           p.last_progress))
+        self.r_params["sorted_participations"] = sorted_participations
+
         self.r_params["show_teams"] = show_teams
+
         if format == "txt":
             self.set_header("Content-Type", "text/plain")
             self.set_header("Content-Disposition",
@@ -104,8 +117,6 @@ class RankingHandler(BaseHandler):
 
             include_partial = True
 
-            contest = self.r_params["contest"]
-
             row = ["Username", "User"]
             if show_teams:
                 row.append("Team")
@@ -120,8 +131,7 @@ class RankingHandler(BaseHandler):
 
             writer.writerow(row)
 
-            for p in sorted(contest.participations,
-                            key=lambda p: p.total_score, reverse=True):
+            for p in sorted_participations:
                 if p.hidden:
                     continue
 
@@ -131,12 +141,12 @@ class RankingHandler(BaseHandler):
                     row.append(p.team.name if p.team else "")
                 assert len(contest.tasks) == len(p.scores)
                 for t_score, t_partial in p.scores:  # Custom field, see above
-                    row.append(t_score)
+                    row.append(str(t_score))
                     if include_partial:
                         row.append("*" if t_partial else "")
 
                 total_score, partial = p.total_score  # Custom field, see above
-                row.append(total_score)
+                row.append(str(total_score))
                 if include_partial:
                     row.append("*" if partial else "")
 

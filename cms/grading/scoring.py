@@ -31,7 +31,7 @@ from __future__ import unicode_literals
 from future.builtins.disabled import *  # noqa
 from future.builtins import *  # noqa
 
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 
 from sqlalchemy.orm import joinedload
 
@@ -205,3 +205,31 @@ def _task_score_max(submissions_and_results):
             partial = True
 
     return score, partial
+
+
+def participation_last_progress(participation):
+    """Return the time of the last submission that increased the score of
+    the user's participation.
+    """
+    # As this function is primarily used when generating a rankings table
+    # (AWS's RankingHandler), we optimize for the case where we are generating
+    # results for all users and all tasks. As such, for the following code to
+    # be more efficient, the query that generated task and user should have
+    # come from a joinedload with the submissions, tokens and
+    # submission_results table. Doing so means that this function should incur
+    # no exta database queries.
+
+    task_sr = defaultdict(list)
+
+    for sub in participation.submissions:
+        sub_sr = sub.get_result(sub.task.active_dataset)
+
+        if sub_sr.score:
+            task_sr[sub.task_id].append((sub_sr.score, sub.timestamp))
+
+    task_last_progress = [
+        sorted(task_sr[tid], key=lambda x: (-x[0], x[1]))[0][1]
+        for tid in task_sr
+    ]
+
+    return max(task_last_progress)

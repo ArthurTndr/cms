@@ -405,8 +405,6 @@ class YamlLoader(ContestLoader, TaskLoader, UserLoader, TeamLoader):
             title_translations = {}
         args["title_translations"] = title_translations
 
-        # load(conf, args, ["title_translations"])
-
         if name != args["name"]:
             logger.info("The task name (%s) and the directory name (%s) are "
                         "different. The former will be used.", args["name"],
@@ -421,7 +419,7 @@ class YamlLoader(ContestLoader, TaskLoader, UserLoader, TeamLoader):
         logger.info("Loading parameters for task %s.", name)
 
         # This adds support for the importation of the statements in multiple
-        # languages while keeping compatibility with the old format.old
+        # languages while keeping compatibility with the old format.
         # Either primary_language or primary_statements or both can be set.
         # statement.pdf or testo.pdf must correspond to the primary language,
         # and statement_xx.pdf corresponds to the language xx.
@@ -464,6 +462,8 @@ class YamlLoader(ContestLoader, TaskLoader, UserLoader, TeamLoader):
             args["primary_statements"] = statements.keys()
 
         args["submission_format"] = ["%s.%%l" % name]
+
+        load(conf, args, "score_precision")
 
         if conf.get("score_mode", None) == SCORE_MODE_MAX:
             args["score_mode"] = SCORE_MODE_MAX
