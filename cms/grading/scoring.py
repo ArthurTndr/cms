@@ -31,6 +31,7 @@ from __future__ import unicode_literals
 from future.builtins.disabled import *  # noqa
 from future.builtins import *  # noqa
 
+import datetime
 from collections import namedtuple, defaultdict
 
 from sqlalchemy.orm import joinedload
@@ -224,12 +225,15 @@ def participation_last_progress(participation):
     for sub in participation.submissions:
         sub_sr = sub.get_result(sub.task.active_dataset)
 
-        if sub_sr.score:
-            task_sr[sub.task_id].append((sub_sr.score, sub.timestamp))
+        task_sr[sub.task_id].append((sub_sr.score, sub.timestamp))
 
     task_last_progress = [
         sorted(task_sr[tid], key=lambda x: (-x[0], x[1]))[0][1]
         for tid in task_sr
     ]
 
-    return max(task_last_progress)
+    if task_last_progress:
+        return max(task_last_progress)
+    else:
+        # Contestants who didn't submit at all are behind contestants who tried
+        return datetime.datetime.now() + datetime.timedelta(days=365)
