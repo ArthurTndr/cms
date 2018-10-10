@@ -35,6 +35,7 @@ from future.builtins.disabled import *  # noqa
 from future.builtins import *  # noqa
 import six
 
+import time
 import csv
 import io
 
@@ -129,6 +130,8 @@ class RankingHandler(BaseHandler):
             if include_partial:
                 row.append("P")
 
+            row.append("Last progress")
+
             writer.writerow(row)
 
             for p in sorted_participations:
@@ -149,6 +152,14 @@ class RankingHandler(BaseHandler):
                 row.append(str(total_score))
                 if include_partial:
                     row.append("*" if partial else "")
+
+                if total_score > 0:
+                    timestamp = int(
+                        time.mktime(p.last_progress.timetuple())
+                        + p.last_progress.microsecond / 1000000.0)
+                    row.append(str(timestamp))
+                else:
+                    row.append("")
 
                 if six.PY3:
                     writer.writerow(row)  # untested
