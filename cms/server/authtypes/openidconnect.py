@@ -126,9 +126,18 @@ class OpenIDConnectLoginHandler(ContestHandler):
             if id_token["nonce"] != json.loads(cookie)[1]:
                 self.redirect_login_error()
 
-            first_name = id_token["given_name"]
-            last_name = id_token["family_name"]
-            email = id_token["email"]
+            first_name = (
+                id_token["given_name"]
+                if "given_name" in id_token
+                else "")
+            last_name = (
+                id_token["family_name"]
+                if "family_name" in id_token
+                else "")
+            email = (
+                id_token["email"]
+                if "email" in id_token
+                else "")
             username = id_token["sub"]
 
             # Check if the user already exists
