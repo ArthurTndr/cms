@@ -160,7 +160,7 @@ class ContestHandler(BaseHandler):
         except ValueError:
             logger.warning("Invalid IP address provided by Tornado: %s",
                            self.request.remote_ip)
-            return None
+            ip_address = None
 
         participation, cookie = authenticate_request(
             self.sql_session, self.contest, self.timestamp, cookie, ip_address)
