@@ -158,8 +158,8 @@ class ContestHandler(BaseHandler):
             # string, whereas ipaddress wants text (unicode) strings.
             ip_address = ipaddress.ip_address(str(self.request.remote_ip))
         except ValueError:
-            logger.warning("Invalid IP address provided by Tornado: %s",
-                           self.request.remote_ip)
+            logger.info("Invalid IP address provided by Tornado: %s",
+                        self.request.remote_ip)
             ip_address = None
 
         participation, cookie = authenticate_request(
