@@ -38,6 +38,7 @@ import six
 import time
 import csv
 import io
+import logging
 
 from sqlalchemy.orm import joinedload
 
@@ -45,6 +46,9 @@ from cms.db import Contest
 from cms.grading.scoring import task_score, participation_last_progress
 
 from .base import BaseHandler, require_permission
+
+
+logger = logging.getLogger(__name__)
 
 
 class RankingHandler(BaseHandler):
@@ -90,10 +94,15 @@ class RankingHandler(BaseHandler):
         self.r_params = self.render_params()
         contest = self.r_params["contest"]
 
+        def participation_key(p):
+            try:
+                return (-p.total_score[0], p.last_progress)
+            except Exception:
+                logger.warning("Cannot rank user %s" % p.user.username)
+                return (0, p.last_progress)
+
         sorted_participations = sorted(
-            contest.participations,
-            key=lambda p: (-p.total_score[0],
-                           p.last_progress))
+            contest.participations, key=participation_key)
         self.r_params["sorted_participations"] = sorted_participations
 
         self.r_params["show_teams"] = show_teams
