@@ -136,7 +136,7 @@ class CheckNonzeroReturn(CheckAbstractEvaluationFailure):
     def __init__(self):
         CheckAbstractEvaluationFailure.__init__(
             self, "nonzero return",
-            "Execution failed because the return code was nonzero")
+            "Runtime error")
 
 
 class Test(object):

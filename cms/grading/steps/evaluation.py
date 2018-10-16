@@ -86,9 +86,9 @@ EVALUATION_MESSAGES = MessageCollection([
                     "the usage before the allocation that caused the "
                     "signal.")),
     HumanMessage("returncode",
-                 N_("Execution failed because the return code was nonzero"),
-                 N_("Your submission failed because it exited with a return "
-                    "code different from 0.")),
+                 N_("Runtime error"),
+                 N_("Runtime error (your submission exited with a return "
+                    "code different from 0)")),
 ])
 
 

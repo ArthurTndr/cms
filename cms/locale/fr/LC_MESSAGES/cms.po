@@ -123,8 +123,8 @@ msgstr ""
 "l'utilisation mémoire visible dans les détails de soumission est "
 "l'utilisation avant l'allocation qui a causé le signal."
 
-msgid "Execution failed because the return code was nonzero"
-msgstr "Exécution échouée: code de retour différent de zéro"
+msgid "Runtime error"
+msgstr "Erreur à l'exécution"
 
 msgid ""
 "Your submission failed because it exited with a return code different from 0."

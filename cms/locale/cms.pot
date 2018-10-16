@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Contest Management System 1.4.dev0\n"
 "Report-Msgid-Bugs-To: contestms@googlegroups.com\n"
-"POT-Creation-Date: 2018-03-28 13:00+0100\n"
+"POT-Creation-Date: 2018-10-16 09:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,11 +18,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.4.0\n"
 
-msgid "Score details temporarily unavailable."
+msgid "N/A"
 msgstr ""
 
-#, python-format
-msgid "Subtask %(index)s"
+msgid "Not correct"
+msgstr ""
+
+msgid "Correct"
+msgstr ""
+
+msgid "Partially correct"
 msgstr ""
 
 msgid "#"
@@ -40,13 +45,17 @@ msgstr ""
 msgid "Memory used"
 msgstr ""
 
-msgid "N/A"
+msgid "Score details temporarily unavailable."
+msgstr ""
+
+#, python-format
+msgid "Subtask %(index)s"
 msgstr ""
 
 msgid "Compilation succeeded"
 msgstr ""
 
-msgid "Your submission successfully compiled to an excutable."
+msgid "Your submission successfully compiled to an executable."
 msgstr ""
 
 msgid "Compilation failed"
@@ -116,35 +125,20 @@ msgid ""
 "time limit."
 msgstr ""
 
-#, python-format
-msgid ""
-"Execution killed with signal %s (could be triggered by violating memory "
-"limits)"
+msgid "Execution killed (could be triggered by violating memory limits)"
 msgstr ""
 
 msgid ""
-"Your submission was killed with the specified signal. Among other things, "
-"this might be caused by exceeding the memory limit. Note that if this is the"
-" reason, the memory usage visible in the submission details is the usage "
-"before the allocation that caused the signal."
+"The evaluation was killed by a signal.Among other things, this might be "
+"caused by exceeding the memory limit. Note that if this is the reason, the "
+"memory usage visible in the submission details is the usage before the "
+"allocation that caused the signal."
 msgstr ""
 
-msgid "Execution failed because the return code was nonzero"
+msgid "Runtime error"
 msgstr ""
 
-msgid "Your submission failed because it exited with a return code different from 0."
-msgstr ""
-
-msgid "Not correct"
-msgstr ""
-
-msgid "Correct"
-msgstr ""
-
-msgid "Partially correct"
-msgstr ""
-
-msgid "Invalid files in submission"
+msgid "Runtime error (your submission exited with a return code different from 0)"
 msgstr ""
 
 msgid "Execution completed successfully"
@@ -154,6 +148,15 @@ msgid "No compilation needed"
 msgstr ""
 
 msgid "File not submitted"
+msgstr ""
+
+msgid "Question too long!"
+msgstr ""
+
+#, python-format
+msgid ""
+"Subject must be at most %(max_subject_length)d characters, content at most "
+"%(max_text_length)d.max_subject_length"
 msgstr ""
 
 msgid "contest-token"
@@ -247,18 +250,6 @@ msgstr[1] ""
 msgid "You have no limitations on how you use them."
 msgstr ""
 
-msgid "Question too big!"
-msgstr ""
-
-msgid "You have reached the question length limit."
-msgstr ""
-
-msgid "Question received"
-msgstr ""
-
-msgid "Your question has been received, you will be notified when it is answered."
-msgstr ""
-
 msgid "Too many print jobs!"
 msgstr ""
 
@@ -285,10 +276,33 @@ msgstr ""
 msgid "Please try again."
 msgstr ""
 
+msgid "Token request discarded"
+msgstr ""
+
+msgid "Your request has been discarded because you have no tokens available."
+msgstr ""
+
+msgid ""
+"Your request has been discarded because you already used a token on that "
+"submission."
+msgstr ""
+
+msgid "Question received"
+msgstr ""
+
+msgid "Your question has been received, you will be notified when it is answered."
+msgstr ""
+
 msgid "Print job received"
 msgstr ""
 
 msgid "Your print job has been received."
+msgstr ""
+
+msgid "Submission received"
+msgstr ""
+
+msgid "Your submission has been received and is currently being evaluated."
 msgstr ""
 
 msgid "Compiling..."
@@ -306,122 +320,10 @@ msgstr ""
 msgid "Evaluated"
 msgstr ""
 
-msgid "Token request discarded"
-msgstr ""
-
-msgid "Your request has been discarded because you have no tokens available."
-msgstr ""
-
-msgid ""
-"Your request has been discarded because you already used a token on that "
-"submission."
-msgstr ""
-
 msgid "Token request received"
 msgstr ""
 
 msgid "Your request has been received and applied to the submission."
-msgstr ""
-
-#, python-format
-msgid "You have reached the maximum limit of at most %d submissions among all tasks."
-msgstr ""
-
-#, python-format
-msgid "You have reached the maximum limit of at most %d submissions on this task."
-msgstr ""
-
-msgid "Too many submissions!"
-msgstr ""
-
-#, python-format
-msgid "Among all tasks, you can submit again after %d seconds from last submission."
-msgstr ""
-
-#, python-format
-msgid "For this task, you can submit again after %d seconds from last submission."
-msgstr ""
-
-msgid "Submissions too frequent!"
-msgstr ""
-
-msgid "Invalid submission format!"
-msgstr ""
-
-msgid "Invalid archive format!"
-msgstr ""
-
-msgid "The submitted archive could not be opened."
-msgstr ""
-
-msgid "Cannot recognize the submission language."
-msgstr ""
-
-#, python-format
-msgid "Language %s not allowed in this contest."
-msgstr ""
-
-msgid "Invalid submission!"
-msgstr ""
-
-msgid "Submission too big!"
-msgstr ""
-
-#, python-format
-msgid "Each source file must be at most %d bytes long."
-msgstr ""
-
-msgid "Submission storage failed!"
-msgstr ""
-
-msgid "Submission received"
-msgstr ""
-
-msgid "Your submission has been received and is currently being evaluated."
-msgstr ""
-
-#, python-format
-msgid "You have reached the maximum limit of at most %d tests among all tasks."
-msgstr ""
-
-#, python-format
-msgid "You have reached the maximum limit of at most %d tests on this task."
-msgstr ""
-
-msgid "Too many tests!"
-msgstr ""
-
-#, python-format
-msgid "Among all tasks, you can test again after %d seconds from last test."
-msgstr ""
-
-#, python-format
-msgid "For this task, you can test again after %d seconds from last test."
-msgstr ""
-
-msgid "Tests too frequent!"
-msgstr ""
-
-msgid "Invalid test format!"
-msgstr ""
-
-msgid "Cannot recognize the user test language."
-msgstr ""
-
-msgid "Invalid test!"
-msgstr ""
-
-msgid "Test too big!"
-msgstr ""
-
-msgid "Input too big!"
-msgstr ""
-
-#, python-format
-msgid "The input file must be at most %d bytes long."
-msgstr ""
-
-msgid "Test storage failed!"
 msgstr ""
 
 msgid "Test received"
@@ -434,6 +336,21 @@ msgid "Executing..."
 msgstr ""
 
 msgid "Executed"
+msgstr ""
+
+msgid "Secure authentication"
+msgstr ""
+
+msgid "Username"
+msgstr ""
+
+msgid "Password"
+msgstr ""
+
+msgid "Login"
+msgstr ""
+
+msgid "Reset"
 msgstr ""
 
 msgid "Communication"
@@ -457,9 +374,6 @@ msgstr ""
 msgid "Ask question"
 msgstr ""
 
-msgid "Reset"
-msgstr ""
-
 msgid "no answer yet"
 msgstr ""
 
@@ -473,10 +387,7 @@ msgstr ""
 msgid "Logout"
 msgstr ""
 
-#, python-format
-msgid ""
-"Logged in as <strong>%(first_name)s %(last_name)s</strong> "
-"<em>(%(username)s)</em>"
+msgid "Logged in as"
 msgstr ""
 
 msgid "Failed to log in."
@@ -486,15 +397,6 @@ msgid "Welcome"
 msgstr ""
 
 msgid "Please log in"
-msgstr ""
-
-msgid "Username"
-msgstr ""
-
-msgid "Password"
-msgstr ""
-
-msgid "Login"
 msgstr ""
 
 msgid "New message"
@@ -556,17 +458,6 @@ msgid "GNU Affero General Public License"
 msgstr ""
 
 msgid "Choose a contest"
-msgstr ""
-
-msgid "Programming languages and libraries"
-msgstr ""
-
-msgid "Standard Template Library"
-msgstr ""
-
-msgid ""
-"The main Java class of the solution should have exactly the same name as the"
-" task."
 msgstr ""
 
 msgid "Submission details for compilation"
@@ -737,12 +628,6 @@ msgstr ""
 msgid "Memory limit"
 msgstr ""
 
-msgid "Type"
-msgstr ""
-
-msgid "Files"
-msgstr ""
-
 msgid "Tokens"
 msgstr ""
 
@@ -836,8 +721,7 @@ msgstr ""
 msgid "No tokens"
 msgstr ""
 
-#, python-format
-msgid "%(name)s (%(short_name)s) <small>description</small>"
+msgid "description"
 msgstr ""
 
 msgid "no statement available"
@@ -851,12 +735,6 @@ msgid ""
 "languages."
 msgstr ""
 
-msgid "You can see (and download) all of them using the list on the right."
-msgstr ""
-
-msgid "Some suggested translations follow."
-msgstr ""
-
 #, python-format
 msgid "Statement in <b>%(lang)s</b>"
 msgstr ""
@@ -865,15 +743,10 @@ msgstr ""
 msgid "Statement in %(lang)s"
 msgstr ""
 
-#, python-format
-msgid "<b>%(lang)s</b>"
-msgstr ""
-
-#, python-format
-msgid "%(lang)s"
-msgstr ""
-
 msgid "Some details"
+msgstr ""
+
+msgid "Type"
 msgstr ""
 
 msgid "Compilation commands"
@@ -957,6 +830,9 @@ msgid "Score"
 msgstr ""
 
 msgid "Official"
+msgstr ""
+
+msgid "Files"
 msgstr ""
 
 msgid "Token"

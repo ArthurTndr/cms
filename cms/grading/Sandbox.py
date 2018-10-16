@@ -1241,7 +1241,7 @@ class IsolateSandbox(SandboxBase):
             return "Execution killed with signal %s" % \
                 self.get_killing_signal()
         elif status == self.EXIT_NONZERO_RETURN:
-            return "Execution failed because the return code was nonzero"
+            return "Runtime error"
 
     def inner_absolute_path(self, path):
         """Translate from a relative path inside the sandbox to an
