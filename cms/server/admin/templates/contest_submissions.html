@@ -12,6 +12,8 @@
            contest_id=contest.id) }}
   </p>
 
+  <p>Download <a href="{{ url("contest", contest.id, "rawsubs") }}">submissions info</a></p>
+
   {% set page_url = url["contest"][contest.id]["submissions"] %}
   {% include "fragments/submission_rows.html" %}
 </div>

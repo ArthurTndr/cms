@@ -10,6 +10,7 @@
 # Copyright © 2014 Fabian Gundlach <320pointsguy@gmail.com>
 # Copyright © 2016 Myungwoo Chun <mc.tamaki@gmail.com>
 # Copyright © 2016 Amir Keivan Mohtashami <akmohtashami97@gmail.com>
+# Copyright © 2018 Louis Sugy <contact@nyri0.fr>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -225,7 +226,8 @@ def participation_last_progress(participation):
     for sub in participation.submissions:
         sub_sr = sub.get_result(sub.task.active_dataset)
 
-        task_sr[sub.task_id].append((sub_sr.score, sub.timestamp))
+        if sub_sr.score:
+            task_sr[sub.task_id].append((sub_sr.score, sub.timestamp))
 
     task_last_progress = [
         sorted(task_sr[tid], key=lambda x: (-x[0], x[1]))[0][1]

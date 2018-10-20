@@ -64,6 +64,8 @@ from .contestquestion import \
     QuestionIgnoreHandler
 from .contestranking import \
     RankingHandler
+from .rawsubmissions import \
+    RawSubHandler
 from .task import \
     AddTaskHandler, \
     TaskHandler, \
@@ -146,6 +148,7 @@ HANDLERS = [
     # Contest's submissions / user tests
 
     (r"/contest/([0-9]+)/submissions", ContestSubmissionsHandler),
+    (r"/contest/([0-9]+)/rawsubs", RawSubHandler),
     (r"/contest/([0-9]+)/user_tests", ContestUserTestsHandler),
 
     # Contest's announcements
