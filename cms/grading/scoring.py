@@ -226,7 +226,7 @@ def participation_last_progress(participation):
     for sub in participation.submissions:
         sub_sr = sub.get_result(sub.task.active_dataset)
 
-        if sub_sr.score:
+        if sub_sr.score and sub.timestamp:
             task_sr[sub.task_id].append((sub_sr.score, sub.timestamp))
 
     task_last_progress = [

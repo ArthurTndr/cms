@@ -126,7 +126,7 @@ class RankingHandler(BaseHandler):
                 output = io.BytesIO()
             writer = csv.writer(output)
 
-            include_partial = True
+            include_partial = False
 
             row = ["Username", "User"]
             if show_teams:
