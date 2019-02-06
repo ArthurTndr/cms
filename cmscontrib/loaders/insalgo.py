@@ -61,12 +61,13 @@ def utf_8_encoder(unicode_csv_data):
         yield line.encode('utf-8')
 
 
-class ShakerUserLoader(YamlLoader):
-    """Load users stored using the Shaker format.
+class InsalgoLoader(YamlLoader):
+    """Load users stored using a custom format.
     """
 
-    short_name = 'shaker_format'
-    description = 'Shaker format based on Italian, with CSV-based user format'
+    short_name = 'users_csv'
+    description = ('Based on the Italian format but the users are imported'
+                   ' from the contestants.csv file')
 
     @staticmethod
     def detect(path):
@@ -81,7 +82,7 @@ class ShakerUserLoader(YamlLoader):
         return True
 
     def get_user_loader(self, username):
-        return ShakerUserLoader(
+        return InsalgoLoader(
             os.path.join(self.path, username), self.file_cacher)
 
     def get_user(self):
@@ -220,7 +221,7 @@ class ShakerUserLoader(YamlLoader):
         logger.info("Participations loaded (%d users).", len(participations))
 
         # Load contest from the Italian format
-        contest, tasks, _ = super(ShakerUserLoader, self).get_contest()
+        contest, tasks, _ = super(InsalgoLoader, self).get_contest()
 
         return contest, tasks, participations
 
