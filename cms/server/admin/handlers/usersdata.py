@@ -32,6 +32,7 @@ from future.builtins import *  # noqa
 import os
 import shutil
 import logging
+from datetime import datetime
 from collections import defaultdict
 
 from sqlalchemy.orm import joinedload
@@ -71,24 +72,6 @@ class UsersData(BaseHandler):
             path = "%s/%s/" % (BASE_PATH, p.user.username)
             os.makedirs(path)
 
-            # Find the users' scores for each task
-            scores = []
-            for task in self.contest.tasks:
-                t_score, _ = task_score(p, task)
-                t_score = round(t_score, task.score_precision)
-                scores.append(t_score)
-
-            # Write a csv with some information on the participation
-            info_csv = [["Username", "User"]]
-            for task in self.contest.tasks:
-                info_csv[0].append(task.name)
-            full_name = "%s %s" % (p.user.first_name, p.user.last_name)
-            info_csv.append([p.user.username, full_name])
-            for t_score in scores:
-                info_csv[1].append(str(t_score))
-            with open("%sinfo.csv" % path, "w") as f:
-                f.write("\n".join(",".join(row) for row in info_csv))
-
             # Identify all the files submitted by the user for each task
             task_sr = defaultdict(list)
             for sub in p.submissions:
@@ -115,6 +98,46 @@ class UsersData(BaseHandler):
                 file_content = fc.get_file(digest).read()
                 with open("%s%s" % (path, filename), "w") as f:
                     f.write(file_content.decode("utf8"))
+
+            # Find the users' scores for each task
+            scores = []
+            for task in self.contest.tasks:
+                t_score, _ = task_score(p, task)
+                t_score = round(t_score, task.score_precision)
+                scores.append((task.id, t_score))
+
+            # Find the users' last progress for each task
+            task_last_progress = {
+                tid:
+                sorted(task_sr[tid], key=lambda x: (-x[0], x[1]))[0][1]
+                for tid in task_sr
+            }
+
+            # Write a csv with some information on the participation
+            info_csv = [["Username", "User"]]
+            for task in self.contest.tasks:
+                info_csv[0].append("%s (score)" % task.name)
+                info_csv[0].append("%s (last progress)" % task.name)
+            info_csv[0].append("Last progress")
+            full_name = "%s %s" % (p.user.first_name, p.user.last_name)
+            info_csv.append([p.user.username, full_name])
+            for tid, t_score in scores:
+                info_csv[1].append(str(t_score))
+                if tid in task_last_progress:
+                    last_progress = \
+                        task_last_progress[tid].strftime('%H:%M:%S')
+                else:
+                    last_progress = ""
+                info_csv[1].append(last_progress)
+            if task_last_progress:
+                last_progress_overall_ts = max(task_last_progress.values())
+                last_progress_overall = \
+                    last_progress_overall_ts.strftime('%H:%M:%S')
+            else:
+                last_progress_overall = ""
+            info_csv[1].append(last_progress_overall)
+            with open("%sinfo.csv" % path, "w") as f:
+                f.write("\n".join(",".join(row) for row in info_csv))
 
         # Create a downloadable archive will all this data
         shutil.make_archive("users_data", "zip", ".", "users_data")
