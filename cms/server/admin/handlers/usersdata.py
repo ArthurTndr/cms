@@ -32,6 +32,7 @@ from future.builtins import *  # noqa
 import os
 import shutil
 import logging
+import csv
 from datetime import datetime
 from collections import defaultdict
 
@@ -120,7 +121,8 @@ class UsersData(BaseHandler):
                 info_csv[0].append("%s (last progress)" % task.name)
             info_csv[0].append("Last progress")
             full_name = "%s %s" % (p.user.first_name, p.user.last_name)
-            info_csv.append([p.user.username, full_name])
+            info_csv.append([p.user.username.encode('utf-8'),
+                             full_name.encode('utf-8')])
             for tid, t_score in scores:
                 info_csv[1].append(str(t_score))
                 if tid in task_last_progress:
@@ -136,8 +138,10 @@ class UsersData(BaseHandler):
             else:
                 last_progress_overall = ""
             info_csv[1].append(last_progress_overall)
-            with open("%sinfo.csv" % path, "w") as f:
-                f.write("\n".join(",".join(row) for row in info_csv))
+            with open("%sinfo.csv" % path, "wb") as f_out:
+                csv_writer = csv.writer(f_out)
+                for row in info_csv:
+                    csv_writer.writerow(row)
 
         # Create a downloadable archive will all this data
         shutil.make_archive("users_data", "zip", ".", "users_data")
