@@ -459,7 +459,7 @@ class YamlLoader(ContestLoader, TaskLoader, UserLoader, TeamLoader):
                 sys.exit(1)
 
             args["statements"] = statements
-            args["primary_statements"] = statements.keys()
+            args["primary_statements"] = list(statements.keys())
 
         args["submission_format"] = ["%s.%%l" % name]
 
@@ -523,8 +523,8 @@ class YamlLoader(ContestLoader, TaskLoader, UserLoader, TeamLoader):
                     os.path.join(self.path, "att", filename),
                     "Attachment %s for task %s" % (filename, name))
                 args["attachments"][filename] = Attachment(filename, digest)
-
-        task = Task(**args)
+        print(str(args))
+        task = Task(**args) 
 
         args = {}
         args["task"] = task
