@@ -118,8 +118,8 @@ def ask_for_contest(skip=None):
                 sys.exit(0)
             print("Contests available:")
             for i, row in enumerate(contests):
-                print("%3d  -  ID: %d  -  Name: %s  -  Description: %s" %
-                      (i + 1, row.id, row.name, row.description), end='')
+                #print("%3d  -  ID: %d  -  Name: %s  -  Description: %s" %
+                #      (i + 1, row.id, row.name, row.description), end='')
                 matches[i + 1] = row.id
                 if i == n_contests - 1:
                     print(" (default)")
