@@ -208,7 +208,7 @@ class ContestImporter(object):
                 raise ImportDataError(
                     "Task \"%s\" not found in database. "
                     "Use --import-task to import it." % taskname)
-
+            print("no statements l211", self.no_statements)
             task = task_loader.get_task(get_statement=not self.no_statements)
             if task is None:
                 raise ImportDataError(
@@ -349,7 +349,6 @@ class ContestImporter(object):
 
 def main():
     """Parse arguments and launch process."""
-
     parser = argparse.ArgumentParser(
         description="""\
 Import a contest from disk

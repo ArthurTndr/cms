@@ -523,8 +523,8 @@ class YamlLoader(ContestLoader, TaskLoader, UserLoader, TeamLoader):
                     os.path.join(self.path, "att", filename),
                     "Attachment %s for task %s" % (filename, name))
                 args["attachments"][filename] = Attachment(filename, digest)
-
-        task = Task(**args)
+        print(str(args))
+        task = Task(**args) 
 
         args = {}
         args["task"] = task
