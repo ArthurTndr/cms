@@ -110,7 +110,7 @@ def find_version():
 # which is collected at this stage.
 class build_py_and_l10n(build_py):
     def run(self):
-        self.run_command("compile_catalog")
+        #self.run_command("compile_catalog")
         # Can't use super here as in Py2 it isn't a new-style class.
         build_py.run(self)
 

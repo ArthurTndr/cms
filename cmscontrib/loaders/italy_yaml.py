@@ -459,7 +459,7 @@ class YamlLoader(ContestLoader, TaskLoader, UserLoader, TeamLoader):
                 sys.exit(1)
 
             args["statements"] = statements
-            args["primary_statements"] = statements.keys()
+            args["primary_statements"] = list(statements.keys())
 
         args["submission_format"] = ["%s.%%l" % name]
 
