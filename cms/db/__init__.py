@@ -3,7 +3,7 @@
 
 # Contest Management System - http://cms-dev.github.io/
 # Copyright © 2010-2012 Giovanni Mascellani <mascellani@poisson.phc.unipi.it>
-# Copyright © 2010-2017 Stefano Maggiolo <s.maggiolo@gmail.com>
+# Copyright © 2010-2018 Stefano Maggiolo <s.maggiolo@gmail.com>
 # Copyright © 2010-2012 Matteo Boscariol <boscarim@hotmail.com>
 # Copyright © 2013 Bernard Blackham <bernard@largestprime.net>
 # Copyright © 2013-2018 Luca Wehrstedt <luca.wehrstedt@gmail.com>
@@ -89,7 +89,7 @@ __all__ = [
 
 # Instantiate or import these objects.
 
-version = 37
+version = 39
 
 engine = create_engine(config.database, echo=config.database_debug,
                        pool_timeout=60, pool_recycle=120)
@@ -149,5 +149,6 @@ def get_submission_results_for_dataset(self, dataset):
         .options(subqueryload(SubmissionResult.executables))\
         .options(subqueryload(SubmissionResult.evaluations))\
         .all()
+
 
 Dataset.get_submission_results = get_submission_results_for_dataset
