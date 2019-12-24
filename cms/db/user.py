@@ -44,7 +44,8 @@ from sqlalchemy.dialects.postgresql import ARRAY, CIDR
 
 from cmscommon.crypto import generate_random_password, build_password
 
-from . import CastingArray, Codename, Base, Admin, Contest
+from . import CastingArray, Codename, Base, Contest
+from .admin import Admin
 
 
 class User(Base):

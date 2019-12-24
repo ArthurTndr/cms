@@ -48,7 +48,8 @@ from sqlalchemy.dialects.postgresql import ARRAY
 
 from cms import TOKEN_MODE_DISABLED, TOKEN_MODE_FINITE, TOKEN_MODE_INFINITE
 
-from . import Codename, Base, Admin
+from . import Codename, Base
+from .admin import Admin
 
 
 class Contest(Base):
